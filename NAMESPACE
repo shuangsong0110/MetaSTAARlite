@@ -1,0 +1,27 @@
+exportPattern("^[[:alpha:]]+")
+import(Rcpp, STAAR, MetaSTAAR, STAARpipeline, dplyr, SeqArray, TxDb.Hsapiens.UCSC.hg38.knownGene, Matrix, methods)
+importFrom("stats", "pchisq", "lm", "model.matrix", "quantile", "rnorm", "binomial")
+importFrom("SeqVarTools", "isSNV")
+importFrom("GenomicFeatures", "genes", "promoters")
+importFrom("expm", "sqrtm")
+importFrom("MASS", "ginv")
+
+
+# functions
+export(individual_analysis_MetaSTAARlite_worker,
+       individual_analysis_MetaSTAARlite,
+       individual_analysis_MetaSTAARlite_cond,
+       coding_MetaSTAARlite_worker,
+       coding_MetaSTAARlite,
+       coding_MetaSTAARlite_cond,
+       noncoding_MetaSTAARlite_worker,
+       noncoding_MetaSTAARlite,
+       noncoding_MetaSTAARlite_cond,
+       ncRNA_MetaSTAARlite_worker,
+       ncRNA_MetaSTAARlite,
+       ncRNA_MetaSTAARlite_cond,
+       MetaSTAARlite_worker_sumstat,
+       MetaSTAARlite_worker_cov,
+       MetaSTAARlite_worker_cov_cond,
+       MetaSTAARlite_merge,
+       MetaSTAARlite_merge_cond)
