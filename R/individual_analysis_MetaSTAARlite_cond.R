@@ -1,7 +1,7 @@
 individual_analysis_MetaSTAARlite_cond <- function(individual_results,sample.sizes,sumstat.list,covcond.list,
                                                    mac_cutoff=20,effect.cond=c("homogeneous","heterogeneous"),
                                                    check_qc_label=FALSE){
-  
+
   ## evaluate choices
   effect.cond <- match.arg(effect.cond)
 
@@ -53,7 +53,7 @@ individual_analysis_MetaSTAARlite_cond <- function(individual_results,sample.siz
   })
   rm(sumstat.list,sumstat.varid.list,sumstat.varid.merge)
   gc()
-  
+
   ### select "common" variant based on the input cutoff
   alt_AC.merge <- as.integer(Reduce("+",lapply(sumstat.merge.list, function(x) {x$alt_AC})))
   N.merge.nonzero <- Reduce("+",lapply(sumstat.merge.list, function(x) {x$N * (x$MAC != 0)}))
@@ -71,14 +71,14 @@ individual_analysis_MetaSTAARlite_cond <- function(individual_results,sample.siz
       x$qc_label=="PASS"
     }))
   }
-  
+
   info <- cbind(sumstat.varid.nodup[,c("chr","pos","ref","alt")],
                 alt_AC=alt_AC.merge,MAC=MAC.merge,MAF=MAF.merge,N=N.merge)[cv.index,]
-  
+
   diagV.merge.list <- lapply(sumstat.merge.list, function(x) {
     return(diag(as.vector(x$V)))
   })
-  
+
   ### covariance files for conditional analysis
   variant_info_list <- lapply(covcond.list, function(x) {x$variant_info})
   variant_info_merge <- do.call("rbind",variant_info_list)
@@ -121,7 +121,7 @@ individual_analysis_MetaSTAARlite_cond <- function(individual_results,sample.siz
   rm(variant_info_list,variant_info_merge,variant_info_nodup,variant_info_index_list,
      variant_adj_info_list,variant_adj_info_merge,variant_adj_info_nodup,variant_adj_info_index_list)
   gc()
-  
+
   variant_info <- covcond.list[[1]]$variant_info
   variant_adj_info <- covcond.list[[1]]$variant_adj_info[,c("chr","pos","ref","alt")]
   U_adj.list <- lapply(covcond.list, function(x) {x$variant_adj_info$U})
@@ -138,13 +138,13 @@ individual_analysis_MetaSTAARlite_cond <- function(individual_results,sample.siz
   }else{
     info <- info[,!names(info)%in%c("index")]
   }
-  
+
   variant_info$index <- 1:dim(variant_info)[1]
   var.common.index <- left_join(info,variant_info,by=c("chr"="chr",
                                                        "pos"="pos",
                                                        "ref"="ref",
                                                        "alt"="alt"))$index
-  
+
   if (length(ex.index) > 0){
     if (effect.cond == "homogeneous") {
       U.common.merge <- Reduce("+", lapply(sumstat.merge.list, function(x) {
@@ -158,7 +158,7 @@ individual_analysis_MetaSTAARlite_cond <- function(individual_results,sample.siz
       }, x = sumstat.merge.list, y = GTPG_cond.list, SIMPLIFY = FALSE))
       cov.adj.merge <- Reduce("+", G_condTPG_cond.list)
       cov.common.merge <- Reduce("+", lapply(diagV.merge.list, function(x) {x[cv.index, cv.index][-ex.index,-ex.index]}))
-      
+
       U.merge <- U.common.merge-cov.common.adj.merge%*%ginv(cov.adj.merge)%*%U.adj.merge # Do not use solve()
       cov.merge <- cov.common.merge-cov.common.adj.merge%*%ginv(cov.adj.merge)%*%t(cov.common.adj.merge)
     }else{
@@ -168,7 +168,7 @@ individual_analysis_MetaSTAARlite_cond <- function(individual_results,sample.siz
         z.common <- z[var.common.index,,drop=FALSE] * (2 * (x$alt_AC == x$MAC) - 1)
         return(u-z.common%*%ginv(z.adj)%*%y) # Do not use solve()
       }, x = sumstat.merge.list, y = U_adj.list, z = GTPG_cond.list, z.adj = G_condTPG_cond.list, SIMPLIFY = FALSE))
-      
+
       cov.merge <- Reduce("+", mapply(function(x,y,z,z.adj) {
         cov <- x[cv.index, cv.index][-ex.index,-ex.index]
         y <- y[cv.index,][-ex.index,]
@@ -189,18 +189,18 @@ individual_analysis_MetaSTAARlite_cond <- function(individual_results,sample.siz
       }, x = sumstat.merge.list, y = GTPG_cond.list, SIMPLIFY = FALSE))
       cov.adj.merge <- Reduce("+", G_condTPG_cond.list)
       cov.common.merge <- Reduce("+", lapply(diagV.merge.list, function(x) {x[cv.index, cv.index]}))
-      
+
       U.merge <- U.common.merge-cov.common.adj.merge%*%ginv(cov.adj.merge)%*%U.adj.merge # Do not use solve()
       cov.merge <- cov.common.merge-cov.common.adj.merge%*%ginv(cov.adj.merge)%*%t(cov.common.adj.merge)
     }else{
-      U.merge <- Reduce("+", mapply(function(x,y,z,z_adj) {
+      U.merge <- Reduce("+", mapply(function(x,y,z,z.adj) {
         x <- x[cv.index,]
         u <- x$U * (2 * (x$alt_AC == x$MAC) - 1)
         z.common <- z[var.common.index,,drop=FALSE] * (2 * (x$alt_AC == x$MAC) - 1)
         return(u-z.common%*%ginv(z.adj)%*%y) # Do not use solve()
       }, x = sumstat.merge.list, y = U_adj.list, z = GTPG_cond.list, z.adj = G_condTPG_cond.list, SIMPLIFY = FALSE))
-      
-      cov.merge <- Reduce("+", mapply(function(x,y,z,z_adj) {
+
+      cov.merge <- Reduce("+", mapply(function(x,y,z,z.adj) {
         cov <- x[cv.index, cv.index]
         y <- y[cv.index,]
         z.common <- z[var.common.index,,drop=FALSE] * (2 * (y$alt_AC == y$MAC) - 1)
@@ -208,28 +208,28 @@ individual_analysis_MetaSTAARlite_cond <- function(individual_results,sample.siz
       }, x = diagV.merge.list, y = sumstat.merge.list, z = GTPG_cond.list, z.adj = G_condTPG_cond.list, SIMPLIFY = FALSE))
     }
   }
-  
+
   rm(list=setdiff(ls(), c("info","U.merge","cov.merge")))
   gc()
-  
+
   U.merge <- as.vector(U.merge)
   V.merge <- diag(as.matrix(cov.merge))
   p.merge <- pchisq(U.merge^2/V.merge,df=1,lower.tail=FALSE)
   logp.merge <- -pchisq(U.merge^2/V.merge,df=1,lower.tail=FALSE,log.p=TRUE)
-  
+
   individual_results_cond <- data.frame(CHR=info$chr,
                                         POS=info$pos,
                                         REF=info$ref,
                                         ALT=info$alt,
                                         pvalue_cond=p.merge,
                                         pvalue_cond_log10=logp.merge/log(10))
-  
+
   individual_results <- left_join(individual_results,individual_results_cond,by=c("CHR"="CHR",
                                                                                   "POS"="POS",
                                                                                   "REF"="REF",
                                                                                   "ALT"="ALT"))
   individual_results[is.na(individual_results$pvalue_cond),"pvalue_cond"] <- 1
   individual_results[is.na(individual_results$pvalue_cond_log10),"pvalue_cond_log10"] <- 0
-  
+
   return(individual_results)
 }
