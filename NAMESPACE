@@ -1,10 +1,14 @@
 exportPattern("^[[:alpha:]]+")
 import(Rcpp, STAAR, MetaSTAAR, STAARpipeline, dplyr, SeqArray, TxDb.Hsapiens.UCSC.hg38.knownGene, Matrix, methods)
+import(STAARpipelineSummary, except = genes)
 importFrom("stats", "pchisq", "lm", "model.matrix", "quantile", "rnorm", "binomial")
 importFrom("SeqVarTools", "isSNV")
 importFrom("GenomicFeatures", "genes", "promoters")
 importFrom("expm", "sqrtm")
 importFrom("MASS", "ginv")
+importFrom("grDevices", "dev.off", "png")
+importFrom("graphics", "abline", "legend", "par", "plot")
+importFrom("utils", "write.csv")
 
 
 # functions
@@ -14,6 +18,9 @@ export(individual_analysis_MetaSTAARlite_worker,
        coding_MetaSTAARlite_worker,
        coding_MetaSTAARlite,
        coding_MetaSTAARlite_cond,
+       custom_MetaSTAARlite_worker,
+       custom_MetaSTAARlite,
+       custom_MetaSTAARlite_cond,
        noncoding_MetaSTAARlite_worker,
        noncoding_MetaSTAARlite,
        noncoding_MetaSTAARlite_cond,
@@ -24,4 +31,7 @@ export(individual_analysis_MetaSTAARlite_worker,
        MetaSTAARlite_worker_cov,
        MetaSTAARlite_worker_cov_cond,
        MetaSTAARlite_merge,
-       MetaSTAARlite_merge_cond)
+       MetaSTAARlite_merge_cond,
+       Gene_Centric_Coding_Results_Summary_meta,
+       Gene_Centric_Noncoding_Results_Summary_meta,
+       Individual_Analysis_Results_Summary_meta)

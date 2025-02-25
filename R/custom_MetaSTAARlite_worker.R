@@ -1,19 +1,16 @@
-#' Perform the worker step of MetaSTAARlite for ncRNA masks
+#' Performs the worker step of MetaSTAARlite for custom masks
 #'
 #' This function uses MetaSTAARliteWorker to generate variant summary statistics
 #' and sparse LD matrices for gene-centric coding analysis.
 #'
 #' @param chr an integer which specifies the chromosome number.
-#' @param gene_name a character which specifies the name of the gene to be meta-analyzed using
-#' the MetaSTAARlite pipeline.
+#' @param variant_list a character which specifies the list of variants included.
+#' @param agds_variant_list a dataframe containing the chromosome, position, reference allele, and alternate allele of the
+#' variants to be included.
 #' @param genofile an object of opened annotated GDS (aGDS) file with variant annotation information (and without genotype).
 #' @param obj_nullmodel an object from fitting the null model, which is the
 #' output from either \code{\link{fit_null_glm}} function for unrelated samples or
 #' \code{\link{fit_null_glmmkin}} function for related samples in the \code{\link{STAAR}} package.
-#' @param known_loci the data frame of variants to be adjusted for in conditional analysis. Should
-#' contain four columns in the following order: chromosome (CHR), position (POS), reference allele (REF),
-#' and alternative allele (ALT). Default is NULL.
-#' @param genes a list of all gene names for the given chromosome.
 #' @param known_loci the data frame of variants to be adjusted for in conditional analysis. Should
 #' contain four columns in the following order: chromosome (CHR), position (POS), reference allele (REF),
 #' and alternative allele (ALT). Default is NULL.
@@ -26,8 +23,7 @@
 #' @param check_qc_label a logical value indicating whether variants need to be dropped according to \code{qc_label}
 #' specified in \code{\link{generate_MetaSTAAR_sumstat}} and \code{\link{generate_MetaSTAAR_cov}}. Default is FALSE.
 #' @param variant_type a character specifying the types of variants to be considered. Choices include "SNV", "Indel",
-#'  or "variant" (default = "SNV").
-#' Default is c("SNV","Indel","variant").
+#'  or "variant". Default is "SNV".
 #' @param Annotation_dir a character specifying the channel name of the annotations in the aGDS file.
 #' Default is "annotation/info/FunctionalAnnotation"
 #' @param Annotation_name_catalog a data frame containing the annotation name and the corresponding
@@ -44,12 +40,13 @@
 #' whose minor allele frequency is below \code{cov_maf_cutoff} (the sparse weighted
 #' covariance file), stored as a rectangle format.
 #' @export
-ncRNA_MetaSTAARlite_worker <- function(chr,gene_name,genofile,obj_nullmodel,known_loci=NULL,
-                                       cov_maf_cutoff=0.05,signif.digits=NULL,
-                                       QC_label="annotation/filter",check_qc_label=FALSE,variant_type="SNV",
-                                       Annotation_dir="annotation/info/FunctionalAnnotation",Annotation_name_catalog,
-                                       Use_annotation_weights=TRUE,Annotation_name=NULL,
-                                       silent=FALSE){
+
+custom_MetaSTAARlite_worker <- function(chr,variant_list,agds_variant_list=NULL,genofile,obj_nullmodel,known_loci=NULL,
+                                        cov_maf_cutoff=0.05,signif.digits=NULL,
+                                        QC_label="annotation/filter",check_qc_label=FALSE,variant_type=c("SNV","Indel","variant"),
+                                        Annotation_dir="annotation/info/FunctionalAnnotation",Annotation_name_catalog,
+                                        Use_annotation_weights=c(TRUE,FALSE),Annotation_name=NULL,
+                                        silent=FALSE){
 
   ## evaluate choices
   variant_type <- match.arg(variant_type)
@@ -94,7 +91,7 @@ ncRNA_MetaSTAARlite_worker <- function(chr,gene_name,genofile,obj_nullmodel,know
 
   if(!is.null(known_loci))
   {
-    position <- as.integer(seqGetData(genofile, "position"))
+    position <- as.numeric(seqGetData(genofile, "position"))
     allele <- seqGetData(genofile, "allele")
 
     loc_SNV <- c()
@@ -140,45 +137,22 @@ ncRNA_MetaSTAARlite_worker <- function(chr,gene_name,genofile,obj_nullmodel,know
   rm(filter)
   gc()
 
-  ## ncRNA SNVs
-  GENCODE.Category <- seqGetData(genofile, paste0(Annotation_dir,Annotation_name_catalog$dir[which(Annotation_name_catalog$name=="GENCODE.Category")]))
-  is.in <- ((GENCODE.Category=="ncRNA_exonic")|(GENCODE.Category=="ncRNA_exonic;splicing")|(GENCODE.Category=="ncRNA_splicing"))&(SNVlist)
+  if (!is.null(agds_variant_list)){
+    chr_basic_info <- data.frame(agds_variant_list,variant_id=variant.id,SNVlist=SNVlist)
+  }else{
+    ## Position, REF, ALT
+    position <- as.numeric(seqGetData(genofile, "position"))
+    REF <- as.character(seqGetData(genofile, "$ref"))
+    ALT <- as.character(seqGetData(genofile, "$alt"))
 
-  variant.id.ncRNA <- variant.id[is.in]
+    chr_basic_info <- data.frame(POS=position,REF=REF,ALT=ALT,variant_id=variant.id,SNVlist=SNVlist)
+  }
 
-  rm(GENCODE.Category)
-  gc()
+  ## get variant id in data
+  variant_list_id <- dplyr::left_join(variant_list,chr_basic_info,by=c("POS"="POS","REF"="REF","ALT"="ALT"))
+  variant.id.is.in <- variant_list_id$variant_id[(!is.na(variant_list_id$variant_id))&(variant_list_id$SNVlist)]
 
-  seqSetFilter(genofile,variant.id=variant.id.ncRNA,sample.id=phenotype.id)
-
-  rm(variant.id.ncRNA)
-  gc()
-
-  GENCODE.Info <- seqGetData(genofile, paste0(Annotation_dir,Annotation_name_catalog$dir[which(Annotation_name_catalog$name=="GENCODE.Info")]))
-  GENCODE.Info.split <- strsplit(GENCODE.Info, split = "[;]")
-  Gene <- as.character(sapply(GENCODE.Info.split,function(z) gsub("\\(.*\\)","",z[1])))
-
-  Gene_list_1 <- as.character(sapply(strsplit(Gene,','),'[',1))
-  Gene_list_2 <- as.character(sapply(strsplit(Gene,','),'[',2))
-  Gene_list_3 <- as.character(sapply(strsplit(Gene,','),'[',3))
-
-  rm(GENCODE.Info)
-  gc()
-
-  rm(GENCODE.Info.split)
-  gc()
-
-  variant.id.ncRNA <- seqGetData(genofile, "variant.id")
-
-  seqResetFilter(genofile)
-
-  ### Gene
-  is.in <- union(which(Gene_list_1==gene_name),which(Gene_list_2==gene_name))
-  is.in <- union(is.in,which(Gene_list_3==gene_name))
-
-  variant.is.in <- variant.id.ncRNA[is.in]
-
-  seqSetFilter(genofile,variant.id=variant.is.in,sample.id=phenotype.id)
+  seqSetFilter(genofile,variant.id=variant.id.is.in,sample.id=phenotype.id)
 
   pos <- as.integer(seqGetData(genofile, "position"))
   ref <- as.character(seqGetData(genofile, "$ref"))

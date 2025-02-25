@@ -1,4 +1,4 @@
-#' Performs meta-analysis of ncRNA functional categories by using the MetaSTAARlite pipeline.
+#' Performs meta-analysis of custom functional categories by using the MetaSTAARlite pipeline.
 #'
 #' This function performs meta-analysis to detect associations between a
 #' quantitative/dichotomous phenotype and coding functional categories of a gene by using the MetaSTAARlite pipeline.
@@ -7,21 +7,22 @@
 #' and ACAT-V-MS(1,1) together with p-values of each test weighted by each annotation
 #' using Cauchy method.
 #' @param chr an integer which specifies the chromosome number.
-#' @param gene_name a character which specifies the name of the gene to be meta-analyzed using the MetaSTAAR procedure.
+#' @param mask_name a character which specifies the name of the mask to be meta-analyzed using
+#' the MetaSTAARlite pipeline.
 #' @param sample.sizes a numeric vector with the length of \code{study.names}
 #' indicating the sample size of each study.
-#' @param ncRNA_sumstat_gene_list a list containing study-specific summary statistics corresponding to the specified gene.
-#' @param ncRNA_cov_gene_list a list containing study-specific sparse weighted covariance matrices corresponding to the specified gene.
+#' @param custom_sumstat_mask_list a list containing study-specific summary statistics corresponding to the custom mask.
+#' @param custom_cov_mask_list a list containing study-specific sparse weighted covariance matrices corresponding to the custom mask.
 #' @param cov_maf_cutoff a numeric vector with the length of \code{study.names}
 #' indicating the maximum minor allele frequency cutoffs under which the sparse weighted
 #' covariance files between variants are stored.
-#' @param rare_maf_cutoff the cutoff of maximum minor allele frequency in
+#' @param rare_maf_cutoff a numeric value specifying the cutoff of maximum minor allele frequency in
 #' defining rare variants (default = 0.01).
-#' @param rv_num_cutoff the cutoff of minimum number of variants of meta-analyzing
+#' @param rv_num_cutoff an integer specifying the cutoff of minimum number of variants of meta-analyzing
 #' a given variant-set (default = 2).
 #' @param check_qc_label a logical value indicating whether variants need to be dropped according to \code{qc_label}
 #' specified in \code{\link{generate_MetaSTAAR_sumstat}} and \code{\link{generate_MetaSTAAR_cov}}. Default is FALSE.
-#' @param variant_type a character specifying the type(s) of variant included in the analysis. Choices include "SNV", "Indel", or "variant" (default = "SNV").
+#' @param variant_type a character specifying type of variant included in the analysis. Choices include "SNV", "Indel", or "variant" (default = "SNV").
 #' @param Use_annotation_weights a logical value which determines if annotations will be used as weights or not. Default is TRUE.
 #' @param Annotation_name a character vector of annotation names used in MetaSTAARlite. Default is NULL.
 #' @param silent a logical value which determines if the report of error messages will be suppressed. Default is FALSE.
@@ -40,35 +41,34 @@
 #' (\href{https://doi.org/10.1038/s41588-020-0676-4}{pub})
 #' @export
 
-ncRNA_MetaSTAARlite <- function(chr,gene_name,
-                                sample.sizes,ncRNA_sumstat_gene_list,ncRNA_cov_gene_list,
-                                cov_maf_cutoff,rare_maf_cutoff=0.01,rv_num_cutoff=2,
-                                check_qc_label=FALSE,variant_type="SNV",
-                                Use_annotation_weights=TRUE,Annotation_name=NULL,silent=FALSE){
+custom_MetaSTAARlite <- function(chr,mask_name,
+                                 sample.sizes,custom_sumstat_mask_list,custom_cov_mask_list,
+                                 cov_maf_cutoff,rare_maf_cutoff=0.01,rv_num_cutoff=2,
+                                 check_qc_label=FALSE,variant_type="SNV",
+                                 Use_annotation_weights=TRUE,Annotation_name=NULL,silent=FALSE){
 
   ## evaluate choices
   variant_type <- match.arg(variant_type)
 
   results <- c()
 
-  gene_test_merge <- MetaSTAARlite_merge(chr,sample.sizes,ncRNA_sumstat_gene_list,ncRNA_cov_gene_list,
+  mask_test_merge <- MetaSTAARlite_merge(chr,sample.sizes,custom_sumstat_mask_list,custom_cov_mask_list,
                                          cov_maf_cutoff=cov_maf_cutoff,rare_maf_cutoff=rare_maf_cutoff,
                                          check_qc_label=check_qc_label,variant_type=variant_type,
                                          Use_annotation_weights=Use_annotation_weights,Annotation_name=Annotation_name)
-  if(length(gene_test_merge$U)>=2)
+  if(length(mask_test_merge$U)>=2)
   {
     ## Annotation
-    annotation_phred <- gene_test_merge$annotation_phred
+    annotation_phred <- mask_test_merge$annotation_phred
     pvalues <- 0
-    try(pvalues <- MetaSTAAR(gene_test_merge,annotation_phred,rv_num_cutoff),silent=silent)
+    try(pvalues <- MetaSTAAR(mask_test_merge,annotation_phred,rv_num_cutoff),silent=silent)
 
     if(inherits(pvalues,"list"))
     {
-      results_temp <- rep(NA,4)
-      results_temp[3] <- "ncRNA"
+      results_temp <- rep(NA,3)
       results_temp[2] <- chr
-      results_temp[1] <- as.character(gene_name)
-      results_temp[4] <- pvalues$num_variant
+      results_temp[1] <- as.character(mask_name)
+      results_temp[3] <- pvalues$num_variant
 
 
       results_temp <- c(results_temp,pvalues$results_MetaSTAAR_S_1_25,pvalues$results_MetaSTAAR_S_1_1,
@@ -82,7 +82,7 @@ ncRNA_MetaSTAARlite <- function(chr,gene_name,
   if(!is.null(results))
   {
     colnames(results) <- colnames(results, do.NULL = FALSE, prefix = "col")
-    colnames(results)[1:4] <- c("Gene name","Chr","Category","#SNV")
+    colnames(results)[1:3] <- c("Mask name","Chr","#SNV")
     colnames(results)[(dim(results)[2]-1):dim(results)[2]] <- c("ACAT-O-MS","MetaSTAAR-O")
   }
 
