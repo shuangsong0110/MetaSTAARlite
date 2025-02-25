@@ -8,7 +8,6 @@
 #' indicating the sample size of each study.
 #' @param sumstat.list a list containing study-specific summary statistics corresponding to the specified gene.
 #' @param cov.list a list containing study-specific sparse weighted covariance matrices corresponding to the specified gene.
-<<<<<<< HEAD
 #' @param rare_maf_cutoff a numeric value specifying the cutoff of maximum minor allele frequency in
 #' defining rare variants (default = 0.01).
 #' @param cov_maf_cutoff an numeric value specifying the cutoff of maximum minor allele frequency for covariance matrices.
@@ -18,18 +17,6 @@
 #' @param Use_annotation_weights a logical value which specifies if annotations will be used as weights
 #' or not. Default is TRUE.
 #' @param Annotation_name a character vector of annotation names used in MetaSTAARlite. Default is NULL.
-=======
-#' @param rare_maf_cutoff the cutoff of maximum minor allele frequency in
-#' defining rare variants (default = 0.01).
-#' @param cov_maf_cutoff the cutoff of maximum minor allele frequency for covariance matrices.
-#' @param rv_num_cutoff the cutoff of minimum number of variants of meta-analyzing
-#' a given variant-set (default = 2).
-#' @param check_qc_label a logical value indicating whether variants need to be dropped according to \code{qc_label}
-#' specified in \code{\link{generate_MetaSTAAR_sumstat}} and \code{\link{generate_MetaSTAAR_cov}}. Default is FALSE.
-#' @param variant_type type of variant included in the analysis. Choices include "SNV", "Indel", or "variant". Default is c("SNV","Indel","variant").
-#' @param Use_annotation_weights use annotations as weights or not. Default is TRUE.
-#' @param Annotation_name a vector of annotation names used in MetaSTAAR. Default is NULL.
->>>>>>> origin/main
 #' @return a list of data frames containing the MetaSTAAR p-values (including MetaSTAAR-O) corresponding to the coding functional category of the given gene.
 #' @references Li, X., et al. (2023). Powerful, scalable and resource-efficient
 #' meta-analysis of rare variant associations in large whole genome sequencing studies.
@@ -48,7 +35,7 @@
 MetaSTAARlite_merge <- function(chr,sample.sizes,sumstat.list,cov.list,
                                 rare_maf_cutoff=0.01,cov_maf_cutoff,
                                 check_qc_label=FALSE,variant_type="SNV",
-                                Use_annotation_weights=c(TRUE,FALSE),Annotation_name=NULL){
+                                Use_annotation_weights=TRUE,Annotation_name=NULL){
 
   ## evaluate choices
   variant_type <- match.arg(variant_type)

@@ -28,6 +28,9 @@ custom_MetaSTAARlite_worker(
 
 \item{variant_list}{a character which specifies the list of variants included.}
 
+\item{agds_variant_list}{a dataframe containing the chromosome, position, reference allele, and alternate allele of the
+variants to be included.}
+
 \item{genofile}{an object of opened annotated GDS (aGDS) file with variant annotation information (and without genotype).}
 
 \item{obj_nullmodel}{an object from fitting the null model, which is the
@@ -50,8 +53,8 @@ Default is "annotation/filter".}
 \item{check_qc_label}{a logical value indicating whether variants need to be dropped according to \code{qc_label}
 specified in \code{\link{generate_MetaSTAAR_sumstat}} and \code{\link{generate_MetaSTAAR_cov}}. Default is FALSE.}
 
-\item{variant_type}{a character specifying the types of variants to be considered.
-Default is "SNV".}
+\item{variant_type}{a character specifying the types of variants to be considered. Choices include "SNV", "Indel",
+or "variant". Default is "SNV".}
 
 \item{Annotation_dir}{a character specifying the channel name of the annotations in the aGDS file.
 Default is "annotation/info/FunctionalAnnotation"}

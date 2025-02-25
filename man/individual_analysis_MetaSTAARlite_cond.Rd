@@ -15,6 +15,8 @@ individual_analysis_MetaSTAARlite_cond(
 )
 }
 \arguments{
+\item{individual_results}{a dataframe containing the unconditional results of the meta-analysis.}
+
 \item{sample.sizes}{a numeric vector with the length of \code{study.names}
 indicating the sample size of each study.}
 

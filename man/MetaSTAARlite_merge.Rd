@@ -13,7 +13,7 @@ MetaSTAARlite_merge(
   cov_maf_cutoff,
   check_qc_label = FALSE,
   variant_type = "SNV",
-  Use_annotation_weights = c(TRUE, FALSE),
+  Use_annotation_weights = TRUE,
   Annotation_name = NULL
 )
 }
