@@ -43,7 +43,7 @@
 ncRNA_MetaSTAARlite <- function(chr,gene_name,
                                 sample.sizes,ncRNA_sumstat_gene_list,ncRNA_cov_gene_list,
                                 cov_maf_cutoff,rare_maf_cutoff=0.01,rv_num_cutoff=2,
-                                check_qc_label=FALSE,variant_type="SNV",
+                                check_qc_label=FALSE,variant_type=c("SNV","Indel","variant"),
                                 Use_annotation_weights=TRUE,Annotation_name=NULL,silent=FALSE){
 
   ## evaluate choices

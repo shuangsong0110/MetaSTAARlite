@@ -45,7 +45,7 @@ custom_MetaSTAARlite_worker <- function(chr,variant_list,agds_variant_list=NULL,
                                         cov_maf_cutoff=0.05,signif.digits=NULL,
                                         QC_label="annotation/filter",check_qc_label=FALSE,variant_type=c("SNV","Indel","variant"),
                                         Annotation_dir="annotation/info/FunctionalAnnotation",Annotation_name_catalog,
-                                        Use_annotation_weights=c(TRUE,FALSE),Annotation_name=NULL,
+                                        Use_annotation_weights=TRUE,Annotation_name=NULL,
                                         silent=FALSE){
 
   ## evaluate choices

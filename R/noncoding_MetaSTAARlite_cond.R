@@ -48,8 +48,8 @@
 
 noncoding_MetaSTAARlite_cond <- function(chr,gene_name,
                                          sample.sizes,noncoding_sumstat_gene_list,noncoding_cov_gene_list,noncoding_cov_cond_gene_list,
-                                         cov_maf_cutoff,rare_maf_cutoff=0.01,rv_num_cutoff=2,effect.cond = "homogeneous",
-                                         check_qc_label=FALSE,variant_type="SNV",
+                                         cov_maf_cutoff,rare_maf_cutoff=0.01,rv_num_cutoff=2,effect.cond = c("homogeneous","heterogeneous"),
+                                         check_qc_label=FALSE,variant_type=c("SNV","Indel","variant"),
                                          Use_annotation_weights=TRUE,Annotation_name=NULL,silent=FALSE){
 
   ## evaluate choices

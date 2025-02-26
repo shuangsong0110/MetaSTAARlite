@@ -18,7 +18,7 @@
 #' @export
 
 individual_analysis_MetaSTAARlite_cond <- function(individual_results,sample.sizes,sumstat.list,covcond.list,
-                                                   mac_cutoff=20,effect.cond="homogeneous",
+                                                   mac_cutoff=20,effect.cond=c("homogeneous","heterogeneous"),
                                                    check_qc_label=FALSE){
 
   ## evaluate choices

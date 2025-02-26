@@ -46,9 +46,9 @@
 
 custom_MetaSTAARlite_cond <- function(chr,mask_name,
                                       sample.sizes,custom_sumstat_mask_list,custom_cov_mask_list,custom_cov_cond_mask_list,
-                                      cov_maf_cutoff,rare_maf_cutoff=0.01,rv_num_cutoff=2,effect.cond = "homogeneous",
-                                      check_qc_label=FALSE,variant_type="SNV",
-                                      Use_annotation_weights=c(TRUE,FALSE),Annotation_name=NULL,silent=FALSE){
+                                      cov_maf_cutoff,rare_maf_cutoff=0.01,rv_num_cutoff=2,effect.cond = c("homogeneous","heterogeneous"),
+                                      check_qc_label=FALSE,variant_type=c("SNV","Indel","variant"),
+                                      Use_annotation_weights=TRUE,Annotation_name=NULL,silent=FALSE){
 
   ## evaluate choices
   effect.cond <- match.arg(effect.cond)

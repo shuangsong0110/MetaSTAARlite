@@ -34,7 +34,7 @@
 
 MetaSTAARlite_merge <- function(chr,sample.sizes,sumstat.list,cov.list,
                                 rare_maf_cutoff=0.01,cov_maf_cutoff,
-                                check_qc_label=FALSE,variant_type="SNV",
+                                check_qc_label=FALSE,variant_type=c("SNV","Indel","variant"),
                                 Use_annotation_weights=TRUE,Annotation_name=NULL){
 
   ## evaluate choices

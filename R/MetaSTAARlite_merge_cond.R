@@ -36,9 +36,9 @@
 #' @export
 
 MetaSTAARlite_merge_cond <- function(chr,sample.sizes,sumstat.list,cov.list,covcond.list,
-                                     rare_maf_cutoff=0.01,cov_maf_cutoff,effect.cond = "homogeneous",
-                                     check_qc_label=FALSE,variant_type="SNV",
-                                     Use_annotation_weights=c(TRUE,FALSE),Annotation_name=NULL){
+                                     rare_maf_cutoff=0.01,cov_maf_cutoff,effect.cond = c("homogeneous","heterogeneous"),
+                                     check_qc_label=FALSE,variant_type=c("SNV","Indel","variant"),
+                                     Use_annotation_weights=TRUE,Annotation_name=NULL){
 
   ## evaluate choices
   effect.cond <- match.arg(effect.cond)
