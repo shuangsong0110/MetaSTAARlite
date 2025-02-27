@@ -1,14 +1,13 @@
-#' Performs meta-analysis of noncoding functional categories by using the MetaSTAARlite pipeline.
+#' Performs meta-analysis of noncoding functional categories using MetaSTAARlite
 #'
 #' This function performs meta-analysis to detect associations between a
-#' quantitative/dichotomous phenotype and coding functional categories of a gene by using the MetaSTAAR procedure.
+#' quantitative/dichotomous phenotype and noncoding functional categories of a gene by using the MetaSTAARlite pipeline.
 #' For each coding functional category, the MetaSTAAR-O p-value is a p-value from an omnibus test
 #' that aggregated SKAT-MS(1,25), SKAT-MS(1,1), Burden-MS(1,25), Burden-MS(1,1), ACAT-V-MS(1,25),
 #' and ACAT-V-MS(1,1) together with p-values of each test weighted by each annotation
 #' using Cauchy method.
 #' @param chr an integer which specifies the chromosome number.
-#' @param gene_name a character which specifies the name of the gene to be meta-analyzed using
-#' the MetaSTAARlite pipeline..
+#' @param gene_name a character which specifies the name of the gene to be meta-analyzed using MetaSTAARlite.
 #' @param sample.sizes a numeric vector with the length of \code{study.names}
 #' indicating the sample size of each study.
 #' @param noncoding_sumstat_gene_list a list containing study-specific summary statistics corresponding to the specified gene.
@@ -21,12 +20,13 @@
 #' @param rv_num_cutoff an integer specifying the cutoff of minimum number of variants of meta-analyzing
 #' a given variant-set (default = 2).
 #' @param check_qc_label a logical value indicating whether variants need to be dropped according to \code{qc_label}
-#' specified in \code{\link{generate_MetaSTAAR_sumstat}} and \code{\link{generate_MetaSTAAR_cov}}. Default is FALSE.
-#' @param variant_type a character specifying the type(s) of variant included in the analysis. Choices include "SNV", "Indel", or "variant" (default = "SNV").
-#' @param Use_annotation_weights a logical value which determines if annotations will be used as weights or not. Default is TRUE.
-#' @param Annotation_name a character vector of annotation names used in MetaSTAARlite. Default is NULL.
-#' @param silent a logical value which determines if the report of error messages will be suppressed. Default is FALSE.
-#' @return a list of data frames containing the MetaSTAAR p-values (including MetaSTAAR-O) corresponding to the coding functional category of the given gene.
+#' specified in \code{\link{noncoding_MetaSTAARlite_worker}} (default = FALSE).
+#' @param variant_type a character value specifying the type of variant included in the analysis. Choices include
+#'  "SNV", "Indel", or "variant" (default = "SNV").
+#' @param Use_annotation_weights a logical value which determines if annotations will be used as weights or not (default = TRUE).
+#' @param Annotation_name a character vector of annotation names used in MetaSTAARlite (default = NULL).
+#' @param silent a logical value which determines if the report of error messages will be suppressed (default = FALSE).
+#' @return a list of data frames containing the MetaSTAAR p-values (including MetaSTAAR-O) corresponding to each noncoding functional category of the given gene.
 #' @references Li, X., et al. (2023). Powerful, scalable and resource-efficient
 #' meta-analysis of rare variant associations in large whole genome sequencing studies.
 #' \emph{Nature Genetics}, \emph{55}(1), 154-164.

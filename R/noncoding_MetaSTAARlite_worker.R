@@ -1,44 +1,58 @@
-#' Perform the worker step of MetaSTAARlite for noncoding masks
+#' Generates summary statistics of noncoding functional categories using MetaSTAARlite
 #'
-#' This function uses MetaSTAARliteWorker to generate variant summary statistics
-#' and sparse LD matrices for gene-centric coding analysis.
-#'
+#' This function uses MetaSTAARlite to generate variant-level summary statistics
+#' and sparse covariance matrices for noncoding functional categories of a gene.
 #' @param chr an integer which specifies the chromosome number.
-#' @param gene_name a character which specifies the name of the gene to be meta-analyzed using
-#' the MetaSTAARlite pipeline.
-#' @param genofile an object of opened annotated GDS (aGDS) file with variant annotation information (and without genotype).
-#' @param obj_nullmodel an object from fitting the null model, which is the
-#' output from either \code{\link{fit_null_glm}} function for unrelated samples or
-#' \code{\link{fit_null_glmmkin}} function for related samples in the \code{\link{STAAR}} package.
-#' @param genes a list of all gene names for the given chromosome.
+#' @param gene_name a character which specifies the name of the gene to be meta-analyzed using MetaSTAARlite.
+#' @param genofile an object of opened annotated GDS (aGDS) file.
+#' @param obj_nullmodel an object from fitting the null model, which is either the output from \code{\link{fit_nullmodel}} function
+#' in the \code{\link{STAARpipeline}} package, or the output from \code{fitNullModel} function in the \code{GENESIS} package
+#' and transformed using the \code{\link{genesis2staar_nullmodel}} function in the \code{\link{STAARpipeline}} package.
 #' @param known_loci the data frame of variants to be adjusted for in conditional analysis. Should
 #' contain four columns in the following order: chromosome (CHR), position (POS), reference allele (REF),
-#' and alternative allele (ALT). Default is NULL.
+#' and alternative allele (ALT) (default = NULL).
 #' @param cov_maf_cutoff a numeric value indicating the maximum minor allele frequency cutoff
-#' under which the sparse weighted covariance file between variants is stored.
-#' @param signif.digits an integer specifying the number of digits to be included beyond the
-#' decimal point.
-#' @param QC_label a character specifying the channel name of the QC label in the GDS/aGDS file.
-#' Default is "annotation/filter".
-#' @param check_qc_label a logical value indicating whether variants need to be dropped according to \code{qc_label}
-#' specified in \code{\link{generate_MetaSTAAR_sumstat}} and \code{\link{generate_MetaSTAAR_cov}}. Default is FALSE.
-#' @param variant_type a character specifying the types of variants to be considered. Choices include "SNV", "Indel",
-#'  or "variant" (default = "SNV").
-#' @param Annotation_dir a character specifying the channel name of the annotations in the aGDS file.
-#' Default is "annotation/info/FunctionalAnnotation"
+#' under which the sparse weighted covariance file between variants is stored (default = 0.05).
+#' @param signif.digits an integer indicating the number of significant digits to be used
+#' for storing the sparse weighted covariance file. If \code{signif.digits} is NULL,
+#' it is assumed that no rounding will be performed (default = NULL).
+#' @param QC_label a character specifying the channel name of the QC label in the GDS/aGDS file
+#' (default = "annotation/filter").
+#' @param check_qc_label a logical value indicating whether variants need to be dropped according to \code{qc_label}.
+#' If \code{check_qc_label} is FALSE, then the summary statistics will be stored for PASS variants from the study.
+#' If \code{check_qc_label} is FALSE, then the summary statistics will be stored for all variants from the study,
+#' together will an additional column of \code{qc_label} (default = FALSE).
+#' @param variant_type a character value specifying the type of variant included in the analysis. Choices include
+#'  "SNV", "Indel", or "variant" (default = "SNV").
+#' @param Annotation_dir a character specifying the channel name of the annotations in the aGDS file
+#' (default = "annotation/info/FunctionalAnnotation").
 #' @param Annotation_name_catalog a data frame containing the annotation name and the corresponding
 #' channel name in the aGDS file.
 #' @param Use_annotation_weights a logical value which specifies if annotations will be used as weights
-#' or not. Default is TRUE.
-#' @param Annotation_name a character vector of annotation names used in MetaSTAARlite. Default is NULL.
-#' @param silent a logical value which determines if the report of error messages will be suppressed. Default is FALSE.
-#' @return two objects. First, the data frame of all variants in the variant-set (the summary statistics file),
+#' or not (default = TRUE).
+#' @param Annotation_name a character vector of annotation names used in MetaSTAARlite (default = NULL).
+#' @param silent a logical value which determines if the report of error messages will be suppressed (default = FALSE).
+#' @return a list of the following objects corresponding to each noncoding functional category of the given gene:
+#' (1) the data frame of all variants in the variant-set (the variant-level summary statistics file),
 #' including the following information: chromosome (chr), position (pos), reference allele (ref),
 #' alternative allele (alt), quality control status (qc_label, optional), alternative allele count (alt_AC), minor allele count (MAC),
-#' minor allele frequency (MAF), study sample size (N), score statistic (U), variance (V), and
-#' the (low-rank decomposed) dense component of the covariance file. Second, the sparse matrix of all variants in the variant-set
-#' whose minor allele frequency is below \code{cov_maf_cutoff} (the sparse weighted
-#' covariance file), stored as a rectangle format.
+#' minor allele frequency (MAF), study sample size (N), score statistic (U), variance (V), variant annotations specified in
+#' \code{Annotation_name}, and the low-rank decomposed component of the covariance file;
+#' (2) the sparse matrix of all variants in the variant-set whose minor allele frequency is below \code{cov_maf_cutoff} (the sparse weighted
+#' covariance file); (3) the summary statistics and covariance matrices corresponding to the specified gene for variants to be conditioned on
+#' in \code{known_loci}.
+#' @references Li, X., et al. (2023). Powerful, scalable and resource-efficient
+#' meta-analysis of rare variant associations in large whole genome sequencing studies.
+#' \emph{Nature Genetics}, \emph{55}(1), 154-164.
+#' (\href{https://doi.org/10.1038/s41588-022-01225-6}{pub})
+#' @references Li, Z., Li, X., et al. (2022). A framework for detecting noncoding
+#' rare-variant associations of large-scale whole-genome sequencing studies.
+#' \emph{Nature Methods}.
+#' (\href{https://doi.org/10.1038/s41592-022-01640-x}{pub})
+#' @references Li, X., Li, Z., et al. (2020). Dynamic incorporation of multiple
+#' in silico functional annotations empowers rare variant association analysis of
+#' large whole-genome sequencing studies at scale. \emph{Nature Genetics}, \emph{52}(9), 969-983.
+#' (\href{https://doi.org/10.1038/s41588-020-0676-4}{pub})
 #' @export
 noncoding_MetaSTAARlite_worker <- function(chr,gene_name,genofile,obj_nullmodel,known_loci=NULL,
                                            cov_maf_cutoff=0.05,signif.digits=NULL,
