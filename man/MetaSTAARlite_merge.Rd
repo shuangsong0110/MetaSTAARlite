@@ -2,7 +2,7 @@
 % Please edit documentation in R/MetaSTAARlite_merge.R
 \name{MetaSTAARlite_merge}
 \alias{MetaSTAARlite_merge}
-\title{Merges the generated summary statistics and LD matrices of different studies.}
+\title{Merges the generated summary statistics and sparse covariance matrices of different studies}
 \usage{
 MetaSTAARlite_merge(
   chr,
@@ -12,7 +12,7 @@ MetaSTAARlite_merge(
   rare_maf_cutoff = 0.01,
   cov_maf_cutoff,
   check_qc_label = FALSE,
-  variant_type = "SNV",
+  variant_type = c("SNV", "Indel", "variant"),
   Use_annotation_weights = TRUE,
   Annotation_name = NULL
 )
@@ -23,45 +23,51 @@ MetaSTAARlite_merge(
 \item{sample.sizes}{a numeric vector with the length of \code{study.names}
 indicating the sample size of each study.}
 
-\item{sumstat.list}{a list containing study-specific summary statistics corresponding to the specified gene.}
+\item{sumstat.list}{a list containing study-specific summary statistics from all participating studies.}
 
-\item{cov.list}{a list containing study-specific sparse weighted covariance matrices corresponding to the specified gene.}
+\item{cov.list}{a list containing study-specific sparse weighted covariance matrices from all participating studies.}
 
 \item{rare_maf_cutoff}{a numeric value specifying the cutoff of maximum minor allele frequency in
 defining rare variants (default = 0.01).}
 
-\item{cov_maf_cutoff}{an numeric value specifying the cutoff of maximum minor allele frequency for covariance matrices.}
+\item{cov_maf_cutoff}{a numeric vector with the length of \code{study.names}
+indicating the maximum minor allele frequency cutoffs under which the sparse weighted
+covariance files between variants are stored.}
 
-\item{check_qc_label}{a logical value indicating whether variants need to be dropped according to \code{qc_label}
-specified in \code{\link{generate_MetaSTAAR_sumstat}} and \code{\link{generate_MetaSTAAR_cov}}. Default is FALSE.}
+\item{check_qc_label}{a logical value indicating whether variants need to be dropped according to \code{qc_label} (default = FALSE).}
 
-\item{variant_type}{a character vector specifying the type(s) of variant included in the analysis. Choices include "SNV", "Indel", or "variant". Default is "SNV".}
+\item{variant_type}{a character value specifying the type of variant included in the analysis. Choices include
+"SNV", "Indel", or "variant" (default = "SNV").}
 
-\item{Use_annotation_weights}{a logical value which specifies if annotations will be used as weights
-or not. Default is TRUE.}
+\item{Use_annotation_weights}{a logical value which determines if annotations will be used as weights or not (default = TRUE).}
 
-\item{Annotation_name}{a character vector of annotation names used in MetaSTAARlite. Default is NULL.}
+\item{Annotation_name}{a character vector of annotation names used in MetaSTAARlite (default = NULL).}
 }
 \value{
-a list of data frames containing the MetaSTAAR p-values (including MetaSTAAR-O) corresponding to the coding functional category of the given gene.
+a list with the following members:
+
+\code{info}: the merged data frame of all variants in the variant-set
+of interest whose combined minor allele frequency is below \code{rare_maf_cutoff}, including the
+following information (listed in the same order as \code{U} and the rows/columns of \code{cov}):
+chromosome (chr), position (pos), reference allele (ref), alternative allele (alt),
+combined minor allele count (MAC), and combined minor allele frequency (MAF).
+
+\code{U} the merged score statistics vector of all variants in the variant-set
+of interest whose combined minor allele frequency is below \code{rare_maf_cutoff}.
+
+\code{cov} the merged covariance matrix of all variants in the variant-set
+of interest whose combined minor allele frequency is below \code{rare_maf_cutoff}.
+
+\code{annotation_phred} the merged functional annotation data in PHRED score scale
+of all variants in the variant-set of interest whose combined minor allele frequency is below \code{rare_maf_cutoff}.
 }
 \description{
-This function merges the generated summary statistics and LD matrices of all of the different studies in preparation for the
-meta-analysis step of MetaSTAARlite.
+This function merges the generated variant-level summary statistics and sparse covariance matrices
+of all participating studies in preparation for the meta-analysis step of MetaSTAARlite.
 }
 \references{
 Li, X., et al. (2023). Powerful, scalable and resource-efficient
 meta-analysis of rare variant associations in large whole genome sequencing studies.
 \emph{Nature Genetics}, \emph{55}(1), 154-164.
 (\href{https://doi.org/10.1038/s41588-022-01225-6}{pub})
-
-Li, Z., Li, X., et al. (2022). A framework for detecting noncoding
-rare-variant associations of large-scale whole-genome sequencing studies.
-\emph{Nature Methods}.
-(\href{https://doi.org/10.1038/s41592-022-01640-x}{pub})
-
-Li, X., Li, Z., et al. (2020). Dynamic incorporation of multiple
-in silico functional annotations empowers rare variant association analysis of
-large whole-genome sequencing studies at scale. \emph{Nature Genetics}, \emph{52}(9), 969-983.
-(\href{https://doi.org/10.1038/s41588-020-0676-4}{pub})
 }

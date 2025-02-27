@@ -2,7 +2,7 @@
 % Please edit documentation in R/custom_MetaSTAARlite_cond.R
 \name{custom_MetaSTAARlite_cond}
 \alias{custom_MetaSTAARlite_cond}
-\title{Performs meta-analysis of custom functional categories by using the MetaSTAARlite pipeline.}
+\title{Performs conditional meta-analysis of custom variant-sets (masks) using MetaSTAARlite}
 \usage{
 custom_MetaSTAARlite_cond(
   chr,
@@ -14,10 +14,10 @@ custom_MetaSTAARlite_cond(
   cov_maf_cutoff,
   rare_maf_cutoff = 0.01,
   rv_num_cutoff = 2,
-  effect.cond = "homogeneous",
+  effect.cond = c("homogeneous", "heterogeneous"),
   check_qc_label = FALSE,
-  variant_type = "SNV",
-  Use_annotation_weights = c(TRUE, FALSE),
+  variant_type = c("SNV", "Indel", "variant"),
+  Use_annotation_weights = TRUE,
   Annotation_name = NULL,
   silent = FALSE
 )
@@ -25,15 +25,15 @@ custom_MetaSTAARlite_cond(
 \arguments{
 \item{chr}{an integer which specifies the chromosome number.}
 
-\item{mask_name}{a character which specifies the name of the mask to be meta-analyzed using
-the MetaSTAARlite pipeline..}
+\item{mask_name}{a character which specifies the name of the mask to be meta-analyzed using MetaSTAARlite.}
 
 \item{sample.sizes}{a numeric vector with the length of \code{study.names}
 indicating the sample size of each study.}
 
 \item{custom_sumstat_mask_list}{a list containing study-specific summary statistics corresponding to the custom mask.}
 
-\item{custom_cov_cond_mask_list}{a list containing the names of the variants to condition on}
+\item{custom_cov_cond_mask_list}{a list containing study-specific summary statistics and covariance matrices
+corresponding to the custom mask for variants to be conditioned on.}
 
 \item{cov_maf_cutoff}{a numeric vector with the length of \code{study.names}
 indicating the maximum minor allele frequency cutoffs under which the sparse weighted
@@ -45,31 +45,33 @@ defining rare variants (default = 0.01).}
 \item{rv_num_cutoff}{an integer specifying the cutoff of minimum number of variants of meta-analyzing
 a given variant-set (default = 2).}
 
-\item{effect.cond}{a character vector specifying whether the effects of variants to be adjusted for
-in conditional analysis are "homogeneous" or "heterogeneous". Default is "homogeneous".}
+\item{effect.cond}{a character value indicating the effects of variants to be adjusted for
+in conditional analysis are "homogeneous" or "heterogeneous" (default = "homogeneous").}
 
 \item{check_qc_label}{a logical value indicating whether variants need to be dropped according to \code{qc_label}
-specified in \code{\link{generate_MetaSTAAR_sumstat}} and \code{\link{generate_MetaSTAAR_cov}}. Default is FALSE.}
+specified in \code{\link{custom_MetaSTAARlite_worker}} (default = FALSE).}
 
-\item{variant_type}{a character specifying the type of variant included in the analysis. Choices include "SNV", "Indel", or "variant" (default = "SNV").}
+\item{variant_type}{a character value specifying the type of variant included in the analysis. Choices include
+"SNV", "Indel", or "variant" (default = "SNV").}
 
-\item{Use_annotation_weights}{a logical value which determines if annotations will be used as weights or not. Default is TRUE.}
+\item{Use_annotation_weights}{a logical value which determines if annotations will be used as weights or not (default = TRUE).}
 
-\item{Annotation_name}{a character vector of annotation names used in MetaSTAARlite. Default is NULL.}
+\item{Annotation_name}{a character vector of annotation names used in MetaSTAARlite (default = NULL).}
 
-\item{silent}{a logical value which determines if the report of error messages will be suppressed. Default is FALSE.}
+\item{silent}{a logical value which determines if the report of error messages will be suppressed (default = FALSE).}
 
 \item{coding_cov_mask_list}{a list containing study-specific sparse weighted covariance matrices corresponding to the custom mask.}
 }
 \value{
-a list of data frames containing the MetaSTAAR p-values (including MetaSTAAR-O) corresponding to the coding functional category of the given gene.
+a list of data frames containing the conditional MetaSTAAR p-values (including MetaSTAAR-O) corresponding to the custom mask.
 }
 \description{
-This function performs meta-analysis to detect associations between a
-quantitative/dichotomous phenotype and coding functional categories of a gene by using the MetaSTAARlite pipeline.
-For each coding functional category, the MetaSTAAR-O p-value is a p-value from an omnibus test
-that aggregated SKAT-MS(1,25), SKAT-MS(1,1), Burden-MS(1,25), Burden-MS(1,1), ACAT-V-MS(1,25),
-and ACAT-V-MS(1,1) together with p-values of each test weighted by each annotation
+This function performs meta-analysis to detect conditional associations between a
+quantitative/dichotomous phenotype and a user-specified custom mask
+adjusting for set of known variants by using the MetaSTAARlite pipeline.
+For each custom mask, the conditional MetaSTAAR-O p-value is a p-value from an omnibus test
+that aggregated conditional SKAT-MS(1,25), SKAT-MS(1,1), Burden-MS(1,25), Burden-MS(1,1), ACAT-V-MS(1,25),
+and ACAT-V-MS(1,1) together with conditional p-values of each test weighted by each annotation
 using Cauchy method.
 }
 \references{

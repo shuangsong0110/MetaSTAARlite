@@ -10,7 +10,7 @@ individual_analysis_MetaSTAARlite_cond(
   sumstat.list,
   covcond.list,
   mac_cutoff = 20,
-  effect.cond = "homogeneous",
+  effect.cond = c("homogeneous", "heterogeneous"),
   check_qc_label = FALSE
 )
 }

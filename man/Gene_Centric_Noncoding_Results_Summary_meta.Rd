@@ -2,7 +2,7 @@
 % Please edit documentation in R/Gene_Centric_Noncoding_Results_Summary_meta.R
 \name{Gene_Centric_Noncoding_Results_Summary_meta}
 \alias{Gene_Centric_Noncoding_Results_Summary_meta}
-\title{Generates summary table and/or visualization for the meta-analysis of noncoding functional categories that was conducted.}
+\title{Generates summary table and visualization for the meta-analysis of noncoding functional categories that was conducted using MetaSTAARlite}
 \usage{
 Gene_Centric_Noncoding_Results_Summary_meta(
   gene_centric_noncoding_jobs_num,
@@ -37,15 +37,16 @@ Gene_Centric_Noncoding_Results_Summary_meta(
 
 \item{ncRNA_results_name}{a character which specifies the name (excluding the jobs number) of the ncRNA meta-analysis results files.}
 
-\item{alpha}{a numeric value which specifies the desired significance threshold for the gene-centric noncoding meta-analysis. Default is 2.5E-06.}
+\item{alpha}{a numeric value which specifies the desired significance threshold for the gene-centric noncoding meta-analysis (default = 2.5E-06).}
 
-\item{alpha_ncRNA}{a numeric value which specifies the desired significance threshold for the ncRNA meta-analysis. Default is 2.5E-06.}
+\item{alpha_ncRNA}{a numeric value which specifies the desired significance threshold for the ncRNA meta-analysis (default is 2.5E-06).}
 
-\item{manhattan_plot}{a logical value which determines if a Manhattan plot is generated. Default is FALSE.}
+\item{manhattan_plot}{a logical value which determines if a Manhattan plot is generated (default = FALSE).}
 
-\item{QQ_plot}{a logical value which determines if a QQ plot is generated. Default is FALSE.}
+\item{QQ_plot}{a logical value which determines if a QQ plot is generated (default = FALSE).}
 }
 \description{
-This function generates a summary table, Manhattan plot, and QQ plot for the meta-analysis of noncoding functional categories that was conducted
+This function takes in objects of gene-centric noncoding meta-analysis results from MetaSTAARlite and generates a summary table,
+Manhattan plot, and QQ plot for the meta-analysis of noncoding functional categories that was conducted
 based on the parameters provided by the user.
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/ncRNA_MetaSTAARlite_cond.R
 \name{ncRNA_MetaSTAARlite_cond}
 \alias{ncRNA_MetaSTAARlite_cond}
-\title{Performs conditional meta-analysis of ncRNA functional categories by using the MetaSTAARlite pipeline.}
+\title{Performs conditional meta-analysis of long noncoding RNA (ncRNA) category using MetaSTAARlite}
 \usage{
 ncRNA_MetaSTAARlite_cond(
   chr,
@@ -14,9 +14,9 @@ ncRNA_MetaSTAARlite_cond(
   cov_maf_cutoff,
   rare_maf_cutoff = 0.01,
   rv_num_cutoff = 2,
-  effect.cond = "homogeneous",
+  effect.cond = c("homogeneous", "heterogeneous"),
   check_qc_label = FALSE,
-  variant_type = "SNV",
+  variant_type = c("SNV", "Indel", "variant"),
   Use_annotation_weights = TRUE,
   Annotation_name = NULL,
   silent = FALSE
@@ -25,8 +25,7 @@ ncRNA_MetaSTAARlite_cond(
 \arguments{
 \item{chr}{an integer which specifies the chromosome number.}
 
-\item{gene_name}{a character which specifies the name of the gene to be meta-analyzed using
-the MetaSTAARlite pipeline..}
+\item{gene_name}{a character which specifies the name of the ncRNA gene to be meta-analyzed using MetaSTAARlite.}
 
 \item{sample.sizes}{a numeric vector with the length of \code{study.names}
 indicating the sample size of each study.}
@@ -34,8 +33,6 @@ indicating the sample size of each study.}
 \item{ncRNA_sumstat_gene_list}{a list containing study-specific summary statistics corresponding to the specified gene.}
 
 \item{ncRNA_cov_gene_list}{a list containing study-specific sparse weighted covariance matrices corresponding to the specified gene.}
-
-\item{ncRNA_cov_cond_gene_list}{a list containing the variants to be conditioned on}
 
 \item{cov_maf_cutoff}{a numeric vector with the length of \code{study.names}
 indicating the maximum minor allele frequency cutoffs under which the sparse weighted
@@ -47,31 +44,35 @@ defining rare variants (default = 0.01).}
 \item{rv_num_cutoff}{the cutoff of minimum number of variants of meta-analyzing
 a given variant-set (default = 2).}
 
-\item{effect.cond}{a character vector specifying whether the effects of variants to be adjusted for
-in conditional analysis are "homogeneous" or "heterogeneous". Default is "homogeneous".}
+\item{effect.cond}{a character value indicating the effects of variants to be adjusted for
+in conditional analysis are "homogeneous" or "heterogeneous" (default = "homogeneous").}
 
 \item{check_qc_label}{a logical value indicating whether variants need to be dropped according to \code{qc_label}
-specified in \code{\link{generate_MetaSTAAR_sumstat}} and \code{\link{generate_MetaSTAAR_cov}}. Default is FALSE.}
+specified in \code{\link{ncRNA_MetaSTAARlite_worker}} (default = FALSE).}
 
-\item{variant_type}{a character specifying the type(s) of variant included in the analysis. Choices include
+\item{variant_type}{a character value specifying the type of variant included in the analysis. Choices include
 "SNV", "Indel", or "variant" (default = "SNV").}
 
-\item{Use_annotation_weights}{a logical value which determines if annotations will be used as weights or not. Default is TRUE.}
+\item{Use_annotation_weights}{a logical value which determines if annotations will be used as weights or not (default = TRUE).}
 
-\item{Annotation_name}{a character vector of annotation names used in MetaSTAARlite. Default is NULL.}
+\item{Annotation_name}{a character vector of annotation names used in MetaSTAARlite (default = NULL).}
 
-\item{silent}{a logical value which determines if the report of error messages will be suppressed. Default is FALSE.}
+\item{silent}{a logical value which determines if the report of error messages will be suppressed (default = FALSE).}
+
+\item{coding_cov_cond_gene_list}{a list containing study-specific summary statistics and covariance matrices
+corresponding to the specified gene for variants to be conditioned on.}
 }
 \value{
-a list of data frames containing the MetaSTAAR p-values (including MetaSTAAR-O) corresponding to the coding
- functional category of the given gene.
+a list of data frames containing the conditional MetaSTAAR p-values (including MetaSTAAR-O) corresponding to
+the exonic and splicing category of the given ncRNA gene.
 }
 \description{
-This function performs meta-analysis to detect associations between a
-quantitative/dichotomous phenotype and coding functional categories of a gene by using the MetaSTAARlite pipeline.
-For each coding functional category, the MetaSTAAR-O p-value is a p-value from an omnibus test
-that aggregated SKAT-MS(1,25), SKAT-MS(1,1), Burden-MS(1,25), Burden-MS(1,1), ACAT-V-MS(1,25),
-and ACAT-V-MS(1,1) together with p-values of each test weighted by each annotation
+This function performs meta-analysis to detect conditional associations between a
+quantitative/dichotomous phenotype and the exonic and splicing category of an ncRNA gene
+adjusting for set of known variants by using the MetaSTAARlite pipeline.
+For each coding functional category, the conditional MetaSTAAR-O p-value is a p-value from an omnibus test
+that aggregated conditional SKAT-MS(1,25), SKAT-MS(1,1), Burden-MS(1,25), Burden-MS(1,1), ACAT-V-MS(1,25),
+and ACAT-V-MS(1,1) together with conditional p-values of each test weighted by each annotation
 using Cauchy method.
 }
 \references{
