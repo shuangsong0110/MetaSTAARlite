@@ -12,7 +12,7 @@
 #' @param ncRNA_output_path a character which specifies the file path to the desired location of the produced summary table and visualizations for the ncRNA meta-analysis.
 #' @param ncRNA_results_name a character which specifies the name (excluding the jobs number) of the ncRNA meta-analysis results files.
 #' @param alpha a numeric value which specifies the desired significance threshold for the gene-centric noncoding meta-analysis (default = 2.5E-06).
-#' @param alpha_ncRNA a numeric value which specifies the desired significance threshold for the ncRNA meta-analysis (default is 2.5E-06).
+#' @param alpha_ncRNA a numeric value which specifies the desired significance threshold for the ncRNA meta-analysis (default = 2.5E-06).
 #' @param manhattan_plot a logical value which determines if a Manhattan plot is generated (default = FALSE).
 #' @param QQ_plot a logical value which determines if a QQ plot is generated (default = FALSE).
 

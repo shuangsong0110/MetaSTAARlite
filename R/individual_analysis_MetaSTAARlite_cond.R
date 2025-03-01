@@ -1,20 +1,21 @@
-#' Performs conditional meta-analysis of individual variants by using the MetaSTAARlite pipeline.
+#' Performs conditional meta-analysis of individual variants using MetaSTAARlite
 #'
-#' This function performs meta-analysis to detect associations between a quantitative/dichotomous phenotype
-#' and each individual variant in a genetic region by using score test.
-#' @param individual_results a dataframe containing the unconditional results of the meta-analysis.
+#' This function performs conditional meta-analysis to detect associations between a quantitative/dichotomous phenotype
+#' and each (significant) individual variant by using conditional score test.
+#' @param individual_results a dataframe containing the (significant) results of the individual variant meta-analysis.
 #' @param sample.sizes a numeric vector with the length of \code{study.names}
 #' indicating the sample size of each study.
-#' @param sumstat.list a character vector containing the directories of the study-specific summary statistics file folders.
-#' @param covcond.list a character vector containing the names of variants to be conditioned on.
-#' @param mac_cutoff the cutoff of minimum minor allele count in
-#' defining individual variants. Default is 20.
-#' @param effect.cond a character vector specifying whether the effects of variants to be adjusted for
-#' in conditional analysis are "homogeneous" or "heterogeneous". Default is "homogeneous".
-#' @param check_qc_label a logical value indicating whether variants need to be dropped according to \code{qc_label}. Default is FALSE.
-#' specified in \code{\link{generate_MetaSTAAR_sumstat}} and \code{\link{generate_MetaSTAAR_cov}}.
-#' If \code{check_qc_label} is FALSE, it is assumed that no variant will be dropped (default = FALSE).
-#' @return a data frame containing the score test p-value and the estimated effect size of the alternative allele for each individual variant in the given genetic region.
+#' @param sumstat.list a list containing study-specific summary statistics from all participating studies.
+#' @param covcond.list a list containing study-specific summary statistics and covariance matrices
+#' for variants to be conditioned on from all participating studies.
+#' @param mac_cutoff an integer specifying the cutoff of minimum combined minor allele count in
+#' defining individual variants (default = 20).
+#' @param effect.cond a character value indicating the effects of variants to be adjusted for
+#' in conditional analysis are "homogeneous" or "heterogeneous" (default = "homogeneous").
+#' @param check_qc_label a logical value indicating whether variants need to be dropped according to \code{qc_label}
+#' specified in \code{\link{coding_MetaSTAARlite_worker}} (default = FALSE).
+#' @return a data frame containing the conditional meta-analysis score test p-value and the estimated effect size
+#' of the alternative allele for each (significant) individual variant in \code{individual_results}.
 #' @export
 
 individual_analysis_MetaSTAARlite_cond <- function(individual_results,sample.sizes,sumstat.list,covcond.list,

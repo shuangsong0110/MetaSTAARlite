@@ -1,15 +1,15 @@
-#' Generates summary table and/or visualization for the meta-analysis of individual variants that was conducted.
+#' Generates summary table and visualization for the meta-analysis of individual variants that was conducted using MetaSTAARlite
 #'
-#' This function generates a summary table, Manhattan plot, and QQ plot for the meta-analysis of individual variants that was conducted
+#' This function takes in objects of individual meta-analysis results and generates a summary table,
+#' Manhattan plot, and QQ plot for the meta-analysis of individual variants that was conducted
 #' based on the parameters provided by the user.
-#'
-#' @param jobs_num an integer which specifies the number of jobs done in the meta-analysis.
-#' @param input_path a character which specifies the file path to the meta-analysis results files.
-#' @param output_path a character which specifies the file path to the desired location of the produced summary table and visualizations.
-#' @param indivdual_results_name a character which specifies the name (excluding the jobs number) of the meta-analysis results files.
-#' @param alpha a numeric value which specifies the desired significance threshold. Default is 5E-09.
-#' @param manhattan_plot a logical value which determines if a Manhattan plot is generated. Default is FALSE.
-#' @param QQ_plot a logical value which determines if a QQ plot is generated. Default is FALSE.
+#' @param jobs_num an integer which specifies the number of jobs done in the individual meta-analysis.
+#' @param input_path a character which specifies the file path to the individual meta-analysis results files.
+#' @param output_path a character which specifies the file path to the desired location of the produced summary table and visualizations for individual meta-analysis.
+#' @param indivdual_results_name a character which specifies the name (excluding the jobs number) of the individual meta-analysis results files.
+#' @param alpha a numeric value which specifies the desired significance threshold (default = 5E-09).
+#' @param manhattan_plot a logical value which determines if a Manhattan plot is generated (default = FALSE).
+#' @param QQ_plot a logical value which determines if a QQ plot is generated (default = FALSE).
 
 Individual_Analysis_Results_Summary_meta <- function(jobs_num,input_path,output_path,individual_results_name,
                                                      alpha=5E-09,manhattan_plot=FALSE,QQ_plot=FALSE){
