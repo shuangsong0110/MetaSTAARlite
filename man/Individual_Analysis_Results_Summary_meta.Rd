@@ -2,7 +2,7 @@
 % Please edit documentation in R/Individual_Analysis_Results_Summary_meta.R
 \name{Individual_Analysis_Results_Summary_meta}
 \alias{Individual_Analysis_Results_Summary_meta}
-\title{Generates summary table and/or visualization for the meta-analysis of individual variants that was conducted.}
+\title{Generates summary table and visualization for the meta-analysis of individual variants that was conducted using MetaSTAARlite}
 \usage{
 Individual_Analysis_Results_Summary_meta(
   jobs_num,
@@ -15,21 +15,22 @@ Individual_Analysis_Results_Summary_meta(
 )
 }
 \arguments{
-\item{jobs_num}{an integer which specifies the number of jobs done in the meta-analysis.}
+\item{jobs_num}{an integer which specifies the number of jobs done in the individual meta-analysis.}
 
-\item{input_path}{a character which specifies the file path to the meta-analysis results files.}
+\item{input_path}{a character which specifies the file path to the individual meta-analysis results files.}
 
-\item{output_path}{a character which specifies the file path to the desired location of the produced summary table and visualizations.}
+\item{output_path}{a character which specifies the file path to the desired location of the produced summary table and visualizations for individual meta-analysis.}
 
-\item{alpha}{a numeric value which specifies the desired significance threshold. Default is 5E-09.}
+\item{alpha}{a numeric value which specifies the desired significance threshold (default = 5E-09).}
 
-\item{manhattan_plot}{a logical value which determines if a Manhattan plot is generated. Default is FALSE.}
+\item{manhattan_plot}{a logical value which determines if a Manhattan plot is generated (default = FALSE).}
 
-\item{QQ_plot}{a logical value which determines if a QQ plot is generated. Default is FALSE.}
+\item{QQ_plot}{a logical value which determines if a QQ plot is generated (default = FALSE).}
 
-\item{indivdual_results_name}{a character which specifies the name (excluding the jobs number) of the meta-analysis results files.}
+\item{indivdual_results_name}{a character which specifies the name (excluding the jobs number) of the individual meta-analysis results files.}
 }
 \description{
-This function generates a summary table, Manhattan plot, and QQ plot for the meta-analysis of individual variants that was conducted
+This function takes in objects of individual meta-analysis results and generates a summary table,
+Manhattan plot, and QQ plot for the meta-analysis of individual variants that was conducted
 based on the parameters provided by the user.
 }

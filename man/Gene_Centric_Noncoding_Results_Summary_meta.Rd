@@ -39,7 +39,7 @@ Gene_Centric_Noncoding_Results_Summary_meta(
 
 \item{alpha}{a numeric value which specifies the desired significance threshold for the gene-centric noncoding meta-analysis (default = 2.5E-06).}
 
-\item{alpha_ncRNA}{a numeric value which specifies the desired significance threshold for the ncRNA meta-analysis (default is 2.5E-06).}
+\item{alpha_ncRNA}{a numeric value which specifies the desired significance threshold for the ncRNA meta-analysis (default = 2.5E-06).}
 
 \item{manhattan_plot}{a logical value which determines if a Manhattan plot is generated (default = FALSE).}
 

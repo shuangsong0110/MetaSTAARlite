@@ -2,7 +2,7 @@
 % Please edit documentation in R/individual_analysis_MetaSTAARlite.R
 \name{individual_analysis_MetaSTAARlite}
 \alias{individual_analysis_MetaSTAARlite}
-\title{Performs meta-analysis of individual variants by using the MetaSTAARlite pipeline.}
+\title{Performs meta-analysis of individual variants using MetaSTAARlite}
 \usage{
 individual_analysis_MetaSTAARlite(
   sample.sizes,
@@ -15,17 +15,17 @@ individual_analysis_MetaSTAARlite(
 \item{sample.sizes}{a numeric vector with the length of \code{study.names}
 indicating the sample size of each study.}
 
-\item{sumstat.list}{a character vector containing the directories of the study-specific summary statistics file folders.}
+\item{sumstat.list}{a list containing study-specific summary statistics from all participating studies.}
 
-\item{mac_cutoff}{an integer specifying the cutoff of minimum minor allele count in
-defining individual variants. Default is 20.}
+\item{mac_cutoff}{an integer specifying the cutoff of minimum combined minor allele count in
+defining individual variants (default = 20).}
 
-\item{check_qc_label}{a logical value indicating whether variants need to be dropped according to \code{qc_label}. Default is FALSE.
-specified in \code{\link{generate_MetaSTAAR_sumstat}} and \code{\link{generate_MetaSTAAR_cov}}.
-If \code{check_qc_label} is FALSE, it is assumed that no variant will be dropped (default = FALSE).}
+\item{check_qc_label}{a logical value indicating whether variants need to be dropped according to \code{qc_label}
+specified in \code{\link{individual_analysis_MetaSTAARlite_worker}} (default = FALSE).}
 }
 \value{
-a data frame containing the score test p-value and the estimated effect size of the alternative allele for each individual variant in the given genetic region.
+a data frame containing the meta-analysis score test p-value and the estimated effect size of the alternative allele
+for each individual variant in the given genetic region.
 }
 \description{
 This function performs meta-analysis to detect associations between a quantitative/dichotomous phenotype

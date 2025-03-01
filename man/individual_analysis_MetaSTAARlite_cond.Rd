@@ -2,7 +2,7 @@
 % Please edit documentation in R/individual_analysis_MetaSTAARlite_cond.R
 \name{individual_analysis_MetaSTAARlite_cond}
 \alias{individual_analysis_MetaSTAARlite_cond}
-\title{Performs conditional meta-analysis of individual variants by using the MetaSTAARlite pipeline.}
+\title{Performs conditional meta-analysis of individual variants using MetaSTAARlite}
 \usage{
 individual_analysis_MetaSTAARlite_cond(
   individual_results,
@@ -15,29 +15,30 @@ individual_analysis_MetaSTAARlite_cond(
 )
 }
 \arguments{
-\item{individual_results}{a dataframe containing the unconditional results of the meta-analysis.}
+\item{individual_results}{a dataframe containing the (significant) results of the individual variant meta-analysis.}
 
 \item{sample.sizes}{a numeric vector with the length of \code{study.names}
 indicating the sample size of each study.}
 
-\item{sumstat.list}{a character vector containing the directories of the study-specific summary statistics file folders.}
+\item{sumstat.list}{a list containing study-specific summary statistics from all participating studies.}
 
-\item{covcond.list}{a character vector containing the names of variants to be conditioned on.}
+\item{covcond.list}{a list containing study-specific summary statistics and covariance matrices
+for variants to be conditioned on from all participating studies.}
 
-\item{mac_cutoff}{the cutoff of minimum minor allele count in
-defining individual variants. Default is 20.}
+\item{mac_cutoff}{an integer specifying the cutoff of minimum combined minor allele count in
+defining individual variants (default = 20).}
 
-\item{effect.cond}{a character vector specifying whether the effects of variants to be adjusted for
-in conditional analysis are "homogeneous" or "heterogeneous". Default is "homogeneous".}
+\item{effect.cond}{a character value indicating the effects of variants to be adjusted for
+in conditional analysis are "homogeneous" or "heterogeneous" (default = "homogeneous").}
 
-\item{check_qc_label}{a logical value indicating whether variants need to be dropped according to \code{qc_label}. Default is FALSE.
-specified in \code{\link{generate_MetaSTAAR_sumstat}} and \code{\link{generate_MetaSTAAR_cov}}.
-If \code{check_qc_label} is FALSE, it is assumed that no variant will be dropped (default = FALSE).}
+\item{check_qc_label}{a logical value indicating whether variants need to be dropped according to \code{qc_label}
+specified in \code{\link{coding_MetaSTAARlite_worker}} (default = FALSE).}
 }
 \value{
-a data frame containing the score test p-value and the estimated effect size of the alternative allele for each individual variant in the given genetic region.
+a data frame containing the conditional meta-analysis score test p-value and the estimated effect size
+of the alternative allele for each (significant) individual variant in \code{individual_results}.
 }
 \description{
-This function performs meta-analysis to detect associations between a quantitative/dichotomous phenotype
-and each individual variant in a genetic region by using score test.
+This function performs conditional meta-analysis to detect associations between a quantitative/dichotomous phenotype
+and each (significant) individual variant by using conditional score test.
 }
