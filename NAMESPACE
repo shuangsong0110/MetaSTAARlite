@@ -34,4 +34,5 @@ export(individual_analysis_MetaSTAARlite_worker,
        MetaSTAARlite_merge_cond,
        Gene_Centric_Coding_Results_Summary_meta,
        Gene_Centric_Noncoding_Results_Summary_meta,
-       Individual_Analysis_Results_Summary_meta)
+       Individual_Analysis_Results_Summary_meta,
+	   Genotype_flip_sp_extraction,na.replace.sp)

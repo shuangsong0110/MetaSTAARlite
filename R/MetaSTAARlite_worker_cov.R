@@ -42,7 +42,12 @@ MetaSTAARlite_worker_cov <- function(genotype,obj_nullmodel,cov_maf_cutoff=0.05,
   }
 
   if(inherits(genotype, "sparseMatrix")){
-    MAF <- colMeans(genotype)/2
+    # geno_missing_imputation: "minor"
+    if(any(is.na(genotype@x)))
+    {
+      genotype <- na.replace.sp(genotype,is_NA_to_Zero=TRUE)
+    }
+    MAF <- Matrix::colMeans(genotype)/2
     if (!is.null(qc_label)){
       RV_label <- as.vector((MAF<cov_maf_cutoff)&(MAF>0)&(qc_label=="PASS"))
     }else{

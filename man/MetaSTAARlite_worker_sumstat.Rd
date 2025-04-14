@@ -6,6 +6,7 @@
 \usage{
 MetaSTAARlite_worker_sumstat(
   genotype,
+  ALT_AF = NULL,
   obj_nullmodel,
   variant_info,
   qc_label = NULL,
@@ -15,7 +16,13 @@ MetaSTAARlite_worker_sumstat(
 }
 \arguments{
 \item{genotype}{an n*p genotype matrix (dosage matrix) of the target sequence,
-where n is the sample size and p is the number of genetic variants.}
+where n is the sample size and p is the number of genetic variants. If the input genotype matrix
+is sparse (e.g. \code{dgCMatrix} format), it is assumed that it has been flipped to represent
+minor allele coding.}
+
+\item{ALT_AF}{a numeric vector of alternate allele frequencies for each variant in \code{genotype}. 
+This is required when \code{genotype} is in sparse format (e.g., \code{dgCMatrix}). 
+This vector is the \code{ALT_AF} column from the \code{results_info} data frame returned by the \code{Genotype_flip_sp_extraction} function (default = NULL).}
 
 \item{obj_nullmodel}{an object from fitting the null model, which is either the output from \code{\link{fit_nullmodel}} function
 in the \code{\link{STAARpipeline}} package, or the output from \code{fitNullModel} function in the \code{GENESIS} package

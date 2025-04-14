@@ -51,6 +51,11 @@ MetaSTAARlite_worker_cov_cond <- function(genotype,genotype_adj,obj_nullmodel,va
   }
 
   if(inherits(genotype_adj, "sparseMatrix")){
+    # geno_missing_imputation: "minor"
+    if(any(is.na(genotype_adj@x)))
+    {
+      genotype_adj <- na.replace.sp(genotype_adj,is_NA_to_Zero=TRUE)
+    }
     genotype_adj <- as.matrix(genotype_adj)
   }
 
@@ -65,6 +70,12 @@ MetaSTAARlite_worker_cov_cond <- function(genotype,genotype_adj,obj_nullmodel,va
   if(!inherits(genotype, "sparseMatrix")){
     genotype <- matrix_flip(genotype)$Geno
     genotype <- as(genotype,"dgCMatrix")
+  } else{
+    # geno_missing_imputation: "minor"
+    if(any(is.na(genotype@x)))
+    {
+      genotype <- na.replace.sp(genotype,is_NA_to_Zero=TRUE)
+    }
   }
 
   if(obj_nullmodel$relatedness){

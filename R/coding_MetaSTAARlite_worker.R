@@ -21,7 +21,7 @@
 #' (default = "annotation/filter").
 #' @param check_qc_label a logical value indicating whether variants need to be dropped according to \code{qc_label}.
 #' If \code{check_qc_label} is FALSE, then the summary statistics will be stored for PASS variants from the study.
-#' If \code{check_qc_label} is FALSE, then the summary statistics will be stored for all variants from the study,
+#' If \code{check_qc_label} is TRUE, then the summary statistics will be stored for all variants from the study,
 #' together will an additional column of \code{qc_label} (default = FALSE).
 #' @param variant_type a character value specifying the type of variant included in the analysis. Choices include
 #'  "SNV", "Indel", or "variant" (default = "SNV").
@@ -67,6 +67,7 @@ coding_MetaSTAARlite_worker <- function(chr,gene_name,genofile,obj_nullmodel,gen
   variant_type <- match.arg(variant_type)
 
   phenotype.id <- as.character(obj_nullmodel$id_include)
+  samplesize <- length(phenotype.id)
 
   filter <- seqGetData(genofile, QC_label)
   if(variant_type=="variant")
@@ -105,6 +106,7 @@ coding_MetaSTAARlite_worker <- function(chr,gene_name,genofile,obj_nullmodel,gen
   position <- as.numeric(seqGetData(genofile, "position"))
   variant.id <- seqGetData(genofile, "variant.id")
 
+  G_SNV <- NULL
   if(!is.null(known_loci))
   {
     allele <- seqGetData(genofile, "allele")
@@ -114,38 +116,36 @@ coding_MetaSTAARlite_worker <- function(chr,gene_name,genofile,obj_nullmodel,gen
       loc_SNV <- c(loc_SNV,which((position==known_loci$POS[i])&(allele==paste0(known_loci$REF[i],",",known_loci$ALT[i]))))
     }
 
-    seqSetFilter(genofile,variant.id=variant.id[loc_SNV],sample.id=phenotype.id)
-
-    G_SNV <- seqGetData(genofile, "$dosage")
-
-    if (!is.null(G_SNV)){
-      id.SNV <- seqGetData(genofile,"sample.id")
-      id.SNV.match <- rep(0,length(id.SNV))
-
-      for(i in 1:length(id.SNV))
-      {
-        id.SNV.match[i] <- which.max(id.SNV==phenotype.id[i])
-      }
-
-      G_SNV <- G_SNV[id.SNV.match,,drop=FALSE]
-      G_SNV_MAF <- apply(G_SNV, 2, function(x){sum(x[!is.na(x)])/2/sum(!is.na(x))})
-      for (i in 1:length(G_SNV_MAF)){
-        if (G_SNV_MAF[i] <= 0.5){
-          G_SNV[is.na(G_SNV[,i]),i] <- 0
-        }
-        else{
-          G_SNV[is.na(G_SNV[,i]),i] <- 2
-        }
-      }
-
-      pos_adj <- as.integer(seqGetData(genofile, "position"))
-      ref_adj <- as.character(seqGetData(genofile, "$ref"))
-      alt_adj <- as.character(seqGetData(genofile, "$alt"))
-      variant_adj_info <- data.frame(chr,pos_adj,ref_adj,alt_adj)
-      colnames(variant_adj_info) <- c("chr","pos","ref","alt")
-      variant_adj_info
-
+    if(length(variant.id[loc_SNV])>=1)
+    {
+      seqSetFilter(genofile,variant.id=variant.id[loc_SNV],sample.id=phenotype.id)
+      
+      ## variant id
+      variant.id_adj <- seqGetData(genofile, "variant.id")
+      ## get AF, Missing rate
+      AF_AC_Missing <- seqGetAF_AC_Missing(genofile,minor=FALSE,parallel=FALSE)
+      REF_AF <- AF_AC_Missing$af
+      Missing_rate <- AF_AC_Missing$miss
       seqResetFilter(genofile)
+      
+      Genotype_sp <- Genotype_flip_sp_extraction(genofile,variant.id=variant.id_adj,
+                                                 sample.id=phenotype.id,
+                                                 REF_AF=REF_AF,
+                                                 Missing_rate=Missing_rate,
+                                                 QC_label=QC_label)
+      G_SNV <- Genotype_sp$Geno
+      
+      if(!is.null(G_SNV) & inherits(G_SNV, "dgCMatrix"))
+      {
+        # geno_missing_imputation: "minor"
+        G_SNV <- na.replace.sp(G_SNV,is_NA_to_Zero=TRUE)
+        results_information_adj <- Genotype_sp$results_information
+        variant_adj_info <- results_information_adj[,c("CHR","position","REF","ALT")]
+        colnames(variant_adj_info) <- c("chr","pos","ref","alt")
+        variant_adj_info
+      }
+      rm(Genotype_sp,AF_AC_Missing,REF_AF,Missing_rate,results_information_adj,variant.id_adj)
+      gc()
     }
   }
 
@@ -217,6 +217,18 @@ coding_MetaSTAARlite_worker <- function(chr,gene_name,genofile,obj_nullmodel,gen
     }
   }
 
+  if(length(variant.id.gene)>=1)
+  {
+    ## get AF, Missing rate
+    AF_AC_Missing <- seqGetAF_AC_Missing(genofile,minor=FALSE,parallel=FALSE)
+    REF_AF <- AF_AC_Missing$af
+    Missing_rate <- AF_AC_Missing$miss
+    rm(AF_AC_Missing)
+  } else
+  {
+    REF_AF <- Missing_rate <- NULL
+  }
+  
   ################################################
   #                  plof_ds
   ################################################
@@ -224,29 +236,26 @@ coding_MetaSTAARlite_worker <- function(chr,gene_name,genofile,obj_nullmodel,gen
   lof.in.plof <- (GENCODE.EXONIC.Category=="stopgain")|(GENCODE.EXONIC.Category=="stoploss")|(GENCODE.Category=="splicing")|(GENCODE.Category=="exonic;splicing")|(GENCODE.Category=="ncRNA_splicing")|(GENCODE.Category=="ncRNA_exonic;splicing")|((GENCODE.EXONIC.Category=="nonsynonymous SNV")&(MetaSVM_pred=="D"))
   variant.id.gene.category <- variant.id.gene[lof.in.plof]
 
-  seqSetFilter(genofile,variant.id=variant.id.gene.category,sample.id=phenotype.id)
-
-  pos <- as.integer(seqGetData(genofile, "position"))
-  ref <- as.character(seqGetData(genofile, "$ref"))
-  alt <- as.character(seqGetData(genofile, "$alt"))
+  ## Annotation
+  Anno.Int.PHRED.sub.category <- Anno.Int.PHRED.sub[lof.in.plof,]
+  
+  Genotype_sp <- Genotype_flip_sp_extraction(genofile,variant.id=variant.id.gene.category,
+                                             sample.id=phenotype.id,
+                                             REF_AF=REF_AF[lof.in.plof],
+                                             Missing_rate=Missing_rate[lof.in.plof],
+                                             annotation_phred=Anno.Int.PHRED.sub.category,
+                                             QC_label=QC_label)
+  Geno <- Genotype_sp$Geno
+  Anno.Int.PHRED.sub.category <- Genotype_sp$annotation_phred
+  results_information <- Genotype_sp$results_information
+  rm(Genotype_sp)
+  gc()
+  
   if(check_qc_label){
-    qc_label <- as.character(seqGetData(genofile, QC_label))
+    qc_label <- results_information$qc_label
   }else{
     qc_label <- NULL
   }
-
-  ## genotype id
-  id.genotype <- seqGetData(genofile,"sample.id")
-  # id.genotype.match <- rep(0,length(id.genotype))
-
-  id.genotype.merge <- data.frame(id.genotype,index=seq(1,length(id.genotype)))
-  phenotype.id.merge <- data.frame(phenotype.id)
-  phenotype.id.merge <- dplyr::left_join(phenotype.id.merge,id.genotype.merge,by=c("phenotype.id"="id.genotype"))
-  id.genotype.match <- phenotype.id.merge$index
-
-  ## Genotype
-  Geno <- seqGetData(genofile, "$dosage")
-  Geno <- Geno[id.genotype.match,,drop=FALSE]
 
   summary_stat_list <- list()
   GTSinvG_rare_list <- list()
@@ -256,32 +265,28 @@ coding_MetaSTAARlite_worker <- function(chr,gene_name,genofile,obj_nullmodel,gen
   GTSinvG_rare <- NULL
   cov_cond <- NULL
 
-  if(!is.null(Geno))
+  if(!is.null(Geno) & inherits(Geno, "dgCMatrix"))
   {
-    # Summary statistics
-    genotype <- matrix_impute(Geno)
-    variant_info <- data.frame(chr,pos,ref,alt,row.names=NULL)
-
-    ## Annotation
-    Anno.Int.PHRED.sub.category <- Anno.Int.PHRED.sub[lof.in.plof,]
-
-    try(summary_stat <- MetaSTAARlite_worker_sumstat(genotype,obj_nullmodel,variant_info,qc_label,
+    variant_info <- results_information[,c("CHR","position","REF","ALT")]
+    colnames(variant_info) <- c("chr","pos","ref","alt")
+    
+    ALT_AF <- results_information$ALT_AF
+    
+    # geno_missing_imputation: "minor"
+    Geno <- na.replace.sp(Geno,is_NA_to_Zero=TRUE)
+    
+    ## Summary statistics
+    try(summary_stat <- MetaSTAARlite_worker_sumstat(Geno,ALT_AF,obj_nullmodel,variant_info,qc_label,
                                                      Anno.Int.PHRED.sub.category),silent=silent)
 
-    # Covariance matrices
-    genotype <- matrix_flip(Geno)$Geno
-    genotype <- as(genotype,"dgCMatrix")
-
-    rm(Geno)
-    gc()
-
-    try(GTSinvG_rare <- MetaSTAARlite_worker_cov(genotype,obj_nullmodel,cov_maf_cutoff,
+    ## Covariance matrices
+    try(GTSinvG_rare <- MetaSTAARlite_worker_cov(Geno,obj_nullmodel,cov_maf_cutoff,
                                                  qc_label,signif.digits),silent=silent)
 
-    # Covariance matrices for conditional analysis
-    if(!is.null(known_loci))
+    ## Covariance matrices for conditional analysis
+    if(!is.null(known_loci) & !is.null(G_SNV))
     {
-      try(cov_cond <- MetaSTAARlite_worker_cov_cond(genotype,G_SNV,obj_nullmodel,variant_info,variant_adj_info),silent=silent)
+      try(cov_cond <- MetaSTAARlite_worker_cov_cond(Geno,G_SNV,obj_nullmodel,variant_info,variant_adj_info),silent=silent)
     }
   }
 
@@ -295,60 +300,53 @@ coding_MetaSTAARlite_worker <- function(chr,gene_name,genofile,obj_nullmodel,gen
   lof.in.plof <- (GENCODE.EXONIC.Category=="stopgain")|(GENCODE.EXONIC.Category=="stoploss")|(GENCODE.Category=="splicing")|(GENCODE.Category=="exonic;splicing")|(GENCODE.Category=="ncRNA_splicing")|(GENCODE.Category=="ncRNA_exonic;splicing")
   variant.id.gene.category <- variant.id.gene[lof.in.plof]
 
-  seqSetFilter(genofile,variant.id=variant.id.gene.category,sample.id=phenotype.id)
-
-  pos <- as.integer(seqGetData(genofile, "position"))
-  ref <- as.character(seqGetData(genofile, "$ref"))
-  alt <- as.character(seqGetData(genofile, "$alt"))
+  ## Annotation
+  Anno.Int.PHRED.sub.category <- Anno.Int.PHRED.sub[lof.in.plof,]
+  
+  Genotype_sp <- Genotype_flip_sp_extraction(genofile,variant.id=variant.id.gene.category,
+                                             sample.id=phenotype.id,
+                                             REF_AF=REF_AF[lof.in.plof],
+                                             Missing_rate=Missing_rate[lof.in.plof],
+                                             annotation_phred=Anno.Int.PHRED.sub.category,
+                                             QC_label=QC_label)
+  Geno <- Genotype_sp$Geno
+  Anno.Int.PHRED.sub.category <- Genotype_sp$annotation_phred
+  results_information <- Genotype_sp$results_information
+  rm(Genotype_sp)
+  gc()
+  
   if(check_qc_label){
-    qc_label <- as.character(seqGetData(genofile, QC_label))
+    qc_label <- results_information$qc_label
   }else{
     qc_label <- NULL
   }
-
-  ## genotype id
-  id.genotype <- seqGetData(genofile,"sample.id")
-  # id.genotype.match <- rep(0,length(id.genotype))
-
-  id.genotype.merge <- data.frame(id.genotype,index=seq(1,length(id.genotype)))
-  phenotype.id.merge <- data.frame(phenotype.id)
-  phenotype.id.merge <- dplyr::left_join(phenotype.id.merge,id.genotype.merge,by=c("phenotype.id"="id.genotype"))
-  id.genotype.match <- phenotype.id.merge$index
-
-  ## Genotype
-  Geno <- seqGetData(genofile, "$dosage")
-  Geno <- Geno[id.genotype.match,,drop=FALSE]
 
   summary_stat <- NULL
   GTSinvG_rare <- NULL
   cov_cond <- NULL
 
-  if(!is.null(Geno))
+  if(!is.null(Geno) & inherits(Geno, "dgCMatrix"))
   {
-    # Summary statistics
-    genotype <- matrix_impute(Geno)
-    variant_info <- data.frame(chr,pos,ref,alt,row.names=NULL)
-
-    ## Annotation
-    Anno.Int.PHRED.sub.category <- Anno.Int.PHRED.sub[lof.in.plof,]
-
-    try(summary_stat <- MetaSTAARlite_worker_sumstat(genotype,obj_nullmodel,variant_info,qc_label,
+    variant_info <- results_information[,c("CHR","position","REF","ALT")]
+    colnames(variant_info) <- c("chr","pos","ref","alt")
+    
+    ALT_AF <- results_information$ALT_AF
+    
+    # geno_missing_imputation: "minor"
+    Geno <- na.replace.sp(Geno,is_NA_to_Zero=TRUE)
+    
+    ## Summary statistics
+    try(summary_stat <- MetaSTAARlite_worker_sumstat(Geno,ALT_AF,obj_nullmodel,variant_info,qc_label,
                                                      Anno.Int.PHRED.sub.category),silent=silent)
 
-    # Covariance matrices
-    genotype <- matrix_flip(Geno)$Geno
-    genotype <- as(genotype,"dgCMatrix")
-
-    rm(Geno)
-    gc()
-
-    try(GTSinvG_rare <- MetaSTAARlite_worker_cov(genotype,obj_nullmodel,cov_maf_cutoff,
+    ## Covariance matrices
+    try(GTSinvG_rare <- MetaSTAARlite_worker_cov(Geno,obj_nullmodel,cov_maf_cutoff,
                                                  qc_label,signif.digits),silent=silent)
 
-    # Covariance matrices for conditional analysis
-    if(!is.null(known_loci))
+    ## Covariance matrices for conditional analysis
+    if(!is.null(known_loci) & !is.null(G_SNV))
     {
-      try(cov_cond <- MetaSTAARlite_worker_cov_cond(genotype,G_SNV,obj_nullmodel,variant_info,variant_adj_info),silent=silent)
+      try(cov_cond <- MetaSTAARlite_worker_cov_cond(Geno,G_SNV,obj_nullmodel,variant_info,variant_adj_info),silent=silent)
     }
   }
 
@@ -362,60 +360,53 @@ coding_MetaSTAARlite_worker <- function(chr,gene_name,genofile,obj_nullmodel,gen
   lof.in.synonymous <- (GENCODE.EXONIC.Category=="synonymous SNV")
   variant.id.gene.category <- variant.id.gene[lof.in.synonymous]
 
-  seqSetFilter(genofile,variant.id=variant.id.gene.category,sample.id=phenotype.id)
-
-  pos <- as.integer(seqGetData(genofile, "position"))
-  ref <- as.character(seqGetData(genofile, "$ref"))
-  alt <- as.character(seqGetData(genofile, "$alt"))
+  ## Annotation
+  Anno.Int.PHRED.sub.category <- Anno.Int.PHRED.sub[lof.in.synonymous,]
+  
+  Genotype_sp <- Genotype_flip_sp_extraction(genofile,variant.id=variant.id.gene.category,
+                                             sample.id=phenotype.id,
+                                             REF_AF=REF_AF[lof.in.synonymous],
+                                             Missing_rate=Missing_rate[lof.in.synonymous],
+                                             annotation_phred=Anno.Int.PHRED.sub.category,
+                                             QC_label=QC_label)
+  Geno <- Genotype_sp$Geno
+  Anno.Int.PHRED.sub.category <- Genotype_sp$annotation_phred
+  results_information <- Genotype_sp$results_information
+  rm(Genotype_sp)
+  gc()
+  
   if(check_qc_label){
-    qc_label <- as.character(seqGetData(genofile, QC_label))
+    qc_label <- results_information$qc_label
   }else{
     qc_label <- NULL
   }
-
-  ## genotype id
-  id.genotype <- seqGetData(genofile,"sample.id")
-  # id.genotype.match <- rep(0,length(id.genotype))
-
-  id.genotype.merge <- data.frame(id.genotype,index=seq(1,length(id.genotype)))
-  phenotype.id.merge <- data.frame(phenotype.id)
-  phenotype.id.merge <- dplyr::left_join(phenotype.id.merge,id.genotype.merge,by=c("phenotype.id"="id.genotype"))
-  id.genotype.match <- phenotype.id.merge$index
-
-  ## Genotype
-  Geno <- seqGetData(genofile, "$dosage")
-  Geno <- Geno[id.genotype.match,,drop=FALSE]
 
   summary_stat <- NULL
   GTSinvG_rare <- NULL
   cov_cond <- NULL
 
-  if(!is.null(Geno))
+  if(!is.null(Geno) & inherits(Geno, "dgCMatrix"))
   {
-    # Summary statistics
-    genotype <- matrix_impute(Geno)
-    variant_info <- data.frame(chr,pos,ref,alt,row.names=NULL)
-
-    ## Annotation
-    Anno.Int.PHRED.sub.category <- Anno.Int.PHRED.sub[lof.in.synonymous,]
-
-    try(summary_stat <- MetaSTAARlite_worker_sumstat(genotype,obj_nullmodel,variant_info,qc_label,
+    variant_info <- results_information[,c("CHR","position","REF","ALT")]
+    colnames(variant_info) <- c("chr","pos","ref","alt")
+    
+    ALT_AF <- results_information$ALT_AF
+    
+    # geno_missing_imputation: "minor"
+    Geno <- na.replace.sp(Geno,is_NA_to_Zero=TRUE)
+    
+    ## Summary statistics
+    try(summary_stat <- MetaSTAARlite_worker_sumstat(Geno,ALT_AF,obj_nullmodel,variant_info,qc_label,
                                                      Anno.Int.PHRED.sub.category),silent=silent)
 
-    # Covariance matrices
-    genotype <- matrix_flip(Geno)$Geno
-    genotype <- as(genotype,"dgCMatrix")
-
-    rm(Geno)
-    gc()
-
-    try(GTSinvG_rare <- MetaSTAARlite_worker_cov(genotype,obj_nullmodel,cov_maf_cutoff,
+    ## Covariance matrices
+    try(GTSinvG_rare <- MetaSTAARlite_worker_cov(Geno,obj_nullmodel,cov_maf_cutoff,
                                                  qc_label,signif.digits),silent=silent)
 
-    # Covariance matrices for conditional analysis
-    if(!is.null(known_loci))
+    ## Covariance matrices for conditional analysis
+    if(!is.null(known_loci) & !is.null(G_SNV))
     {
-      try(cov_cond <- MetaSTAARlite_worker_cov_cond(genotype,G_SNV,obj_nullmodel,variant_info,variant_adj_info),silent=silent)
+      try(cov_cond <- MetaSTAARlite_worker_cov_cond(Geno,G_SNV,obj_nullmodel,variant_info,variant_adj_info),silent=silent)
     }
   }
 
@@ -429,60 +420,53 @@ coding_MetaSTAARlite_worker <- function(chr,gene_name,genofile,obj_nullmodel,gen
   lof.in.missense <- (GENCODE.EXONIC.Category=="nonsynonymous SNV")
   variant.id.gene.category <- variant.id.gene[lof.in.missense]
 
-  seqSetFilter(genofile,variant.id=variant.id.gene.category,sample.id=phenotype.id)
-
-  pos <- as.integer(seqGetData(genofile, "position"))
-  ref <- as.character(seqGetData(genofile, "$ref"))
-  alt <- as.character(seqGetData(genofile, "$alt"))
+  ## Annotation
+  Anno.Int.PHRED.sub.category <- Anno.Int.PHRED.sub[lof.in.missense,]
+  
+  Genotype_sp <- Genotype_flip_sp_extraction(genofile,variant.id=variant.id.gene.category,
+                                             sample.id=phenotype.id,
+                                             REF_AF=REF_AF[lof.in.missense],
+                                             Missing_rate=Missing_rate[lof.in.missense],
+                                             annotation_phred=Anno.Int.PHRED.sub.category,
+                                             QC_label=QC_label)
+  Geno <- Genotype_sp$Geno
+  Anno.Int.PHRED.sub.category <- Genotype_sp$annotation_phred
+  results_information <- Genotype_sp$results_information
+  rm(Genotype_sp)
+  gc()
+  
   if(check_qc_label){
-    qc_label <- as.character(seqGetData(genofile, QC_label))
+    qc_label <- results_information$qc_label
   }else{
     qc_label <- NULL
   }
-
-  ## genotype id
-  id.genotype <- seqGetData(genofile,"sample.id")
-  # id.genotype.match <- rep(0,length(id.genotype))
-
-  id.genotype.merge <- data.frame(id.genotype,index=seq(1,length(id.genotype)))
-  phenotype.id.merge <- data.frame(phenotype.id)
-  phenotype.id.merge <- dplyr::left_join(phenotype.id.merge,id.genotype.merge,by=c("phenotype.id"="id.genotype"))
-  id.genotype.match <- phenotype.id.merge$index
-
-  ## Genotype
-  Geno <- seqGetData(genofile, "$dosage")
-  Geno <- Geno[id.genotype.match,,drop=FALSE]
 
   summary_stat <- NULL
   GTSinvG_rare <- NULL
   cov_cond <- NULL
 
-  if(!is.null(Geno))
+  if(!is.null(Geno) & inherits(Geno, "dgCMatrix"))
   {
-    # Summary statistics
-    genotype <- matrix_impute(Geno)
-    variant_info <- data.frame(chr,pos,ref,alt,row.names=NULL)
-
-    ## Annotation
-    Anno.Int.PHRED.sub.category <- Anno.Int.PHRED.sub[lof.in.missense,]
-
-    try(summary_stat <- MetaSTAARlite_worker_sumstat(genotype,obj_nullmodel,variant_info,qc_label,
+    variant_info <- results_information[,c("CHR","position","REF","ALT")]
+    colnames(variant_info) <- c("chr","pos","ref","alt")
+    
+    ALT_AF <- results_information$ALT_AF
+    
+    # geno_missing_imputation: "minor"
+    Geno <- na.replace.sp(Geno,is_NA_to_Zero=TRUE)
+    
+    ## Summary statistics
+    try(summary_stat <- MetaSTAARlite_worker_sumstat(Geno,ALT_AF,obj_nullmodel,variant_info,qc_label,
                                                      Anno.Int.PHRED.sub.category),silent=silent)
 
-    # Covariance matrices
-    genotype <- matrix_flip(Geno)$Geno
-    genotype <- as(genotype,"dgCMatrix")
-
-    rm(Geno)
-    gc()
-
-    try(GTSinvG_rare <- MetaSTAARlite_worker_cov(genotype,obj_nullmodel,cov_maf_cutoff,
+    ## Covariance matrices
+    try(GTSinvG_rare <- MetaSTAARlite_worker_cov(Geno,obj_nullmodel,cov_maf_cutoff,
                                                  qc_label,signif.digits),silent=silent)
 
-    # Covariance matrices for conditional analysis
-    if(!is.null(known_loci))
+    ## Covariance matrices for conditional analysis
+    if(!is.null(known_loci) & !is.null(G_SNV))
     {
-      try(cov_cond <- MetaSTAARlite_worker_cov_cond(genotype,G_SNV,obj_nullmodel,variant_info,variant_adj_info),silent=silent)
+      try(cov_cond <- MetaSTAARlite_worker_cov_cond(Geno,G_SNV,obj_nullmodel,variant_info,variant_adj_info),silent=silent)
     }
   }
 
@@ -496,60 +480,53 @@ coding_MetaSTAARlite_worker <- function(chr,gene_name,genofile,obj_nullmodel,gen
   lof.in.dmissense <- (GENCODE.EXONIC.Category=="nonsynonymous SNV")&(MetaSVM_pred=="D")
   variant.id.gene.category <- variant.id.gene[lof.in.dmissense]
 
-  seqSetFilter(genofile,variant.id=variant.id.gene.category,sample.id=phenotype.id)
-
-  pos <- as.integer(seqGetData(genofile, "position"))
-  ref <- as.character(seqGetData(genofile, "$ref"))
-  alt <- as.character(seqGetData(genofile, "$alt"))
+  ## Annotation
+  Anno.Int.PHRED.sub.category <- Anno.Int.PHRED.sub[lof.in.dmissense,]
+  
+  Genotype_sp <- Genotype_flip_sp_extraction(genofile,variant.id=variant.id.gene.category,
+                                             sample.id=phenotype.id,
+                                             REF_AF=REF_AF[lof.in.dmissense],
+                                             Missing_rate=Missing_rate[lof.in.dmissense],
+                                             annotation_phred=Anno.Int.PHRED.sub.category,
+                                             QC_label=QC_label)
+  Geno <- Genotype_sp$Geno
+  Anno.Int.PHRED.sub.category <- Genotype_sp$annotation_phred
+  results_information <- Genotype_sp$results_information
+  rm(Genotype_sp)
+  gc()
+  
   if(check_qc_label){
-    qc_label <- as.character(seqGetData(genofile, QC_label))
+    qc_label <- results_information$qc_label
   }else{
     qc_label <- NULL
   }
-
-  ## genotype id
-  id.genotype <- seqGetData(genofile,"sample.id")
-  # id.genotype.match <- rep(0,length(id.genotype))
-
-  id.genotype.merge <- data.frame(id.genotype,index=seq(1,length(id.genotype)))
-  phenotype.id.merge <- data.frame(phenotype.id)
-  phenotype.id.merge <- dplyr::left_join(phenotype.id.merge,id.genotype.merge,by=c("phenotype.id"="id.genotype"))
-  id.genotype.match <- phenotype.id.merge$index
-
-  ## Genotype
-  Geno <- seqGetData(genofile, "$dosage")
-  Geno <- Geno[id.genotype.match,,drop=FALSE]
 
   summary_stat <- NULL
   GTSinvG_rare <- NULL
   cov_cond <- NULL
 
-  if(!is.null(Geno))
+  if(!is.null(Geno) & inherits(Geno, "dgCMatrix"))
   {
-    # Summary statistics
-    genotype <- matrix_impute(Geno)
-    variant_info <- data.frame(chr,pos,ref,alt,row.names=NULL)
-
-    ## Annotation
-    Anno.Int.PHRED.sub.category <- Anno.Int.PHRED.sub[lof.in.dmissense,]
-
-    try(summary_stat <- MetaSTAARlite_worker_sumstat(genotype,obj_nullmodel,variant_info,qc_label,
+    variant_info <- results_information[,c("CHR","position","REF","ALT")]
+    colnames(variant_info) <- c("chr","pos","ref","alt")
+    
+    ALT_AF <- results_information$ALT_AF
+    
+    # geno_missing_imputation: "minor"
+    Geno <- na.replace.sp(Geno,is_NA_to_Zero=TRUE)
+    
+    ## Summary statistics
+    try(summary_stat <- MetaSTAARlite_worker_sumstat(Geno,ALT_AF,obj_nullmodel,variant_info,qc_label,
                                                      Anno.Int.PHRED.sub.category),silent=silent)
 
-    # Covariance matrices
-    genotype <- matrix_flip(Geno)$Geno
-    genotype <- as(genotype,"dgCMatrix")
-
-    rm(Geno)
-    gc()
-
-    try(GTSinvG_rare <- MetaSTAARlite_worker_cov(genotype,obj_nullmodel,cov_maf_cutoff,
+    ## Covariance matrices
+    try(GTSinvG_rare <- MetaSTAARlite_worker_cov(Geno,obj_nullmodel,cov_maf_cutoff,
                                                  qc_label,signif.digits),silent=silent)
 
-    # Covariance matrices for conditional analysis
-    if(!is.null(known_loci))
+    ## Covariance matrices for conditional analysis
+    if(!is.null(known_loci) & !is.null(G_SNV))
     {
-      try(cov_cond <- MetaSTAARlite_worker_cov_cond(genotype,G_SNV,obj_nullmodel,variant_info,variant_adj_info),silent=silent)
+      try(cov_cond <- MetaSTAARlite_worker_cov_cond(Geno,G_SNV,obj_nullmodel,variant_info,variant_adj_info),silent=silent)
     }
   }
 

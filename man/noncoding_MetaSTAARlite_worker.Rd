@@ -49,7 +49,7 @@ it is assumed that no rounding will be performed (default = NULL).}
 
 \item{check_qc_label}{a logical value indicating whether variants need to be dropped according to \code{qc_label}.
 If \code{check_qc_label} is FALSE, then the summary statistics will be stored for PASS variants from the study.
-If \code{check_qc_label} is FALSE, then the summary statistics will be stored for all variants from the study,
+If \code{check_qc_label} is TRUE, then the summary statistics will be stored for all variants from the study,
 together will an additional column of \code{qc_label} (default = FALSE).}
 
 \item{variant_type}{a character value specifying the type of variant included in the analysis. Choices include
