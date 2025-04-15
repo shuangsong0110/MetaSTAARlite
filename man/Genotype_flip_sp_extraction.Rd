@@ -59,15 +59,15 @@ The function returns a sparse genotype matrix (\code{"dgCMatrix"}), variant-leve
 \details{
 The extracted variants are processed based on the following three cases:
 (1) Case 1: \code{ALT_AF > 0.5}
-    - Use \code{"\$dosage"} to extract Geno (dosages of the reference allele).
+    - Use \code{"$dosage"} to extract Geno (dosages of the reference allele).
     - Convert the extracted data into the \code{"dgCMatrix"} format (sparse matrix).
 
-(2) Case 2: \code{ALT_AF \\leq 0.5} and (\code{MAF \\geq rare_maf_cutoff} or \code{Missing_rate \\geq Missing_cutoff})
-    - Use \code{"\$dosage_alt"} to extract Geno (dosages of the alternative allele).
+(2) Case 2: \code{ALT_AF <= 0.5} and (\code{MAF >= rare_maf_cutoff} or \code{Missing_rate >= Missing_cutoff})
+    - Use \code{"$dosage_alt"} to extract Geno (dosages of the alternative allele).
     - Convert the extracted data into the \code{"dgCMatrix"} format (sparse matrix).
 
-(3) Case 3: \code{ALT_AF \\leq 0.5} and (\code{MAF < rare_maf_cutoff} and \code{Missing_rate < Missing_cutoff})
-    - Use \code{"\$dosage_sp"} to directly extract Geno in the \code{"dgCMatrix"} format.
+(3) Case 3: \code{ALT_AF <= 0.5} and (\code{MAF < rare_maf_cutoff} and \code{Missing_rate < Missing_cutoff})
+    - Use \code{"$dosage_sp"} to directly extract Geno in the \code{"dgCMatrix"} format.
 
 Note:
 - \code{REF_AF} and \code{Missing_rate} can be efficiently computed using
