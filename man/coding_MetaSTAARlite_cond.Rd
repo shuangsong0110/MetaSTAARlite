@@ -28,7 +28,7 @@ coding_MetaSTAARlite_cond(
 
 \item{gene_name}{a character which specifies the name of the gene to be meta-analyzed using MetaSTAARlite.}
 
-\item{genes}{the \code{genes_info} object from the \code{\link{STAARpipeline}} package.}
+\item{genes}{the \code{genes_info} object from the \code{STAARpipeline} package.}
 
 \item{sample.sizes}{a numeric vector with the length of \code{study.names}
 indicating the sample size of each study.}

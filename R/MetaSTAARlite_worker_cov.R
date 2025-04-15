@@ -8,8 +8,8 @@
 #' is sparse (e.g. \code{dgCMatrix} format), it is assumed that it has been flipped to represent
 #' minor allele coding.
 #' @param obj_nullmodel an object from fitting the null model, which is either the output from \code{\link{fit_nullmodel}} function
-#' in the \code{\link{STAARpipeline}} package, or the output from \code{fitNullModel} function in the \code{GENESIS} package
-#' and transformed using the \code{\link{genesis2staar_nullmodel}} function in the \code{\link{STAARpipeline}} package.
+#' in the \code{STAARpipeline} package, or the output from \code{fitNullModel} function in the \code{GENESIS} package
+#' and transformed using the \code{\link{genesis2staar_nullmodel}} function in the \code{STAARpipeline} package.
 #' @param cov_maf_cutoff a numeric value indicating the maximum minor allele frequency cutoff
 #' under which the sparse weighted covariance file between variants is stored (default = 0.05).
 #' @param qc_label a vector of quality control status for each variant in \code{genotype}, where a PASS variant

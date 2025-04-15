@@ -41,6 +41,8 @@ Gene_Centric_Noncoding_Results_Summary_meta(
 
 \item{alpha_ncRNA}{a numeric value which specifies the desired significance threshold for the ncRNA meta-analysis (default = 2.5E-06).}
 
+\item{ncRNA_pos}{positions of ncRNA genes, required for generating the Manhattan plot and Q-Q plot of the results of ncRNA genes (default = NULL).}
+
 \item{manhattan_plot}{a logical value which determines if a Manhattan plot is generated (default = FALSE).}
 
 \item{QQ_plot}{a logical value which determines if a QQ plot is generated (default = FALSE).}

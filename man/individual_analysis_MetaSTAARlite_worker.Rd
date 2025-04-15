@@ -32,8 +32,8 @@ individual_analysis_MetaSTAARlite_worker(
 \item{genofile}{an object of opened annotated GDS (aGDS) file.}
 
 \item{obj_nullmodel}{an object from fitting the null model, which is either the output from \code{\link{fit_nullmodel}} function
-in the \code{\link{STAARpipeline}} package, or the output from \code{fitNullModel} function in the \code{GENESIS} package
-and transformed using the \code{\link{genesis2staar_nullmodel}} function in the \code{\link{STAARpipeline}} package.}
+in the \code{STAARpipeline} package, or the output from \code{fitNullModel} function in the \code{GENESIS} package
+and transformed using the \code{\link{genesis2staar_nullmodel}} function in the \code{STAARpipeline} package.}
 
 \item{known_loci}{the data frame of variants to be adjusted for in conditional analysis. Should
 contain four columns in the following order: chromosome (CHR), position (POS), reference allele (REF),

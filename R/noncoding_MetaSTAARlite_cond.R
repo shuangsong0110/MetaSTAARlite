@@ -13,7 +13,7 @@
 #' indicating the sample size of each study.
 #' @param noncoding_sumstat_gene_list a list containing study-specific summary statistics corresponding to the specified gene.
 #' @param noncoding_cov_gene_list a list containing study-specific sparse weighted covariance matrices corresponding to the specified gene.
-#' @param coding_cov_cond_gene_list a list containing study-specific summary statistics and covariance matrices
+#' @param noncoding_cov_cond_gene_list a list containing study-specific summary statistics and covariance matrices
 #' corresponding to the specified gene for variants to be conditioned on.
 #' @param cov_maf_cutoff a numeric vector with the length of \code{study.names}
 #' indicating the maximum minor allele frequency cutoffs under which the sparse weighted

@@ -21,13 +21,13 @@ Individual_Analysis_Results_Summary_meta(
 
 \item{output_path}{a character which specifies the file path to the desired location of the produced summary table and visualizations for individual meta-analysis.}
 
+\item{individual_results_name}{a character which specifies the name (excluding the jobs number) of the individual meta-analysis results files.}
+
 \item{alpha}{a numeric value which specifies the desired significance threshold (default = 5E-09).}
 
 \item{manhattan_plot}{a logical value which determines if a Manhattan plot is generated (default = FALSE).}
 
 \item{QQ_plot}{a logical value which determines if a QQ plot is generated (default = FALSE).}
-
-\item{indivdual_results_name}{a character which specifies the name (excluding the jobs number) of the individual meta-analysis results files.}
 }
 \description{
 This function takes in objects of individual meta-analysis results and generates a summary table,

@@ -7,7 +7,7 @@
 na.replace.sp(genotype_sp, m, is_NA_to_Zero = FALSE)
 }
 \arguments{
-\item{genotype_sp}{A sparse genotype matrix of class `dgCMatrix` from the \code{\link{Matrix}} package.}
+\item{genotype_sp}{A sparse genotype matrix of class `dgCMatrix` from the \code{Matrix} package.}
 
 \item{m}{A numeric vector specifying the replacement values for each column.}
 

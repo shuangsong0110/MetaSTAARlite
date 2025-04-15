@@ -11,8 +11,8 @@
 #' This is required when \code{genotype} is in sparse format (e.g., \code{dgCMatrix}). 
 #' This vector is the \code{ALT_AF} column from the \code{results_info} data frame returned by the \code{Genotype_flip_sp_extraction} function (default = NULL).
 #' @param obj_nullmodel an object from fitting the null model, which is either the output from \code{\link{fit_nullmodel}} function
-#' in the \code{\link{STAARpipeline}} package, or the output from \code{fitNullModel} function in the \code{GENESIS} package
-#' and transformed using the \code{\link{genesis2staar_nullmodel}} function in the \code{\link{STAARpipeline}} package.
+#' in the \code{STAARpipeline} package, or the output from \code{fitNullModel} function in the \code{GENESIS} package
+#' and transformed using the \code{\link{genesis2staar_nullmodel}} function in the \code{STAARpipeline} package.
 #' @param variant_info a data frame or matrix of variant information (unique identifier)
 #' with p rows (listed in the same order as the columns of \code{genotype}) and should contain
 #' the following 4 columns: chromosome (chr), position (pos), reference allele (ref), and alternative allele (alt).

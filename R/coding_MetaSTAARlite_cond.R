@@ -9,7 +9,7 @@
 #' using Cauchy method.
 #' @param chr an integer which specifies the chromosome number.
 #' @param gene_name a character which specifies the name of the gene to be meta-analyzed using MetaSTAARlite.
-#' @param genes the \code{genes_info} object from the \code{\link{STAARpipeline}} package.
+#' @param genes the \code{genes_info} object from the \code{STAARpipeline} package.
 #' @param sample.sizes a numeric vector with the length of \code{study.names}
 #' indicating the sample size of each study.
 #' @param coding_sumstat_gene_list a list containing study-specific summary statistics corresponding to the specified gene.

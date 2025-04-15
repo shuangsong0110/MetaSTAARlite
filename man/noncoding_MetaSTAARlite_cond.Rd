@@ -34,6 +34,9 @@ indicating the sample size of each study.}
 
 \item{noncoding_cov_gene_list}{a list containing study-specific sparse weighted covariance matrices corresponding to the specified gene.}
 
+\item{noncoding_cov_cond_gene_list}{a list containing study-specific summary statistics and covariance matrices
+corresponding to the specified gene for variants to be conditioned on.}
+
 \item{cov_maf_cutoff}{a numeric vector with the length of \code{study.names}
 indicating the maximum minor allele frequency cutoffs under which the sparse weighted
 covariance files between variants are stored.}
@@ -58,9 +61,6 @@ specified in \code{\link{noncoding_MetaSTAARlite_worker}} (default = FALSE).}
 \item{Annotation_name}{a character vector of annotation names used in MetaSTAARlite (default = NULL).}
 
 \item{silent}{a logical value which determines if the report of error messages will be suppressed (default = FALSE).}
-
-\item{coding_cov_cond_gene_list}{a list containing study-specific summary statistics and covariance matrices
-corresponding to the specified gene for variants to be conditioned on.}
 }
 \value{
 a list of data frames containing the conditional MetaSTAAR p-values (including MetaSTAAR-O) corresponding to each noncoding functional category of the given gene.

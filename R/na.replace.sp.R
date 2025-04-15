@@ -5,7 +5,7 @@
 #' Otherwise, NA values in each column are replaced with the corresponding entries in `m`.
 #' This function is inspired by \code{glmnet::na.replace} for sparse matrices.
 #'
-#' @param genotype_sp A sparse genotype matrix of class `dgCMatrix` from the \code{\link{Matrix}} package.
+#' @param genotype_sp A sparse genotype matrix of class `dgCMatrix` from the \code{Matrix} package.
 #' @param m A numeric vector specifying the replacement values for each column.
 #' @param is_NA_to_Zero A logical value indicating whether NA values should be replaced with 0 
 #' (default: FALSE). If FALSE, NA values are replaced column-wise using `m`.

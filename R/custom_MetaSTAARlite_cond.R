@@ -12,7 +12,7 @@
 #' @param sample.sizes a numeric vector with the length of \code{study.names}
 #' indicating the sample size of each study.
 #' @param custom_sumstat_mask_list a list containing study-specific summary statistics corresponding to the custom mask.
-#' @param coding_cov_mask_list a list containing study-specific sparse weighted covariance matrices corresponding to the custom mask.
+#' @param custom_cov_mask_list a list containing study-specific sparse weighted covariance matrices corresponding to the custom mask.
 #' @param custom_cov_cond_mask_list a list containing study-specific summary statistics and covariance matrices
 #' corresponding to the custom mask for variants to be conditioned on.
 #' @param cov_maf_cutoff a numeric vector with the length of \code{study.names}

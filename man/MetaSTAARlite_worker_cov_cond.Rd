@@ -23,8 +23,8 @@ the sample size and p_adj is the number of genetic variants to be adjusted for i
 analysis (or a vector of a single variant with length n if p_adj is 1).}
 
 \item{obj_nullmodel}{an object from fitting the null model, which is either the output from \code{\link{fit_nullmodel}} function
-in the \code{\link{STAARpipeline}} package, or the output from \code{fitNullModel} function in the \code{GENESIS} package
-and transformed using the \code{\link{genesis2staar_nullmodel}} function in the \code{\link{STAARpipeline}} package.}
+in the \code{STAARpipeline} package, or the output from \code{fitNullModel} function in the \code{GENESIS} package
+and transformed using the \code{\link{genesis2staar_nullmodel}} function in the \code{STAARpipeline} package.}
 
 \item{variant_info}{a data frame or matrix of variant information (unique identifier)
 with p rows (listed in the same order as the columns of \code{genotype}) and should contain
