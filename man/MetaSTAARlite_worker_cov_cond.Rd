@@ -26,11 +26,11 @@ analysis (or a vector of a single variant with length n if p_adj is 1).}
 in the \code{STAARpipeline} package, or the output from \code{fitNullModel} function in the \code{GENESIS} package
 and transformed using the \code{\link{genesis2staar_nullmodel}} function in the \code{STAARpipeline} package.}
 
-\item{variant_info}{a data frame or matrix of variant information (unique identifier)
+\item{variant_info}{a data frame of variant information (unique identifier)
 with p rows (listed in the same order as the columns of \code{genotype}) and should contain
 the following 4 columns: chromosome (chr), position (pos), reference allele (ref), and alternative allele (alt).}
 
-\item{variant_adj_info}{a data frame or matrix of adjusted variant information (unique identifier)
+\item{variant_adj_info}{a data frame of adjusted variant information (unique identifier)
 with p_adj rows (listed in the same order as the rows of \code{genotype_adj}) and should contain
 the following 4 columns: chromosome (chr), position (pos), reference allele (ref), and alternative allele (alt).}
 }
@@ -41,11 +41,11 @@ a list with the following members:
 and all variants in the conditional variant-set (columns) (the covariance file
 for conditional analysis).
 
-\code{variant_info}: the data frame or matrix of variant information (unique identifier)
+\code{variant_info}: the data frame of variant information (unique identifier)
 with p rows (listed in the same order as the rows of \code{GTPG_cond}) and 4 columns: chromosome (chr),
 position (pos), reference allele (ref), and alternative allele (alt).
 
-\code{variant_adj_info}: the data frame or matrix of adjusted variant information (unique identifier)
+\code{variant_adj_info}: the data frame of adjusted variant information (unique identifier)
 with p_adj rows (listed in the same order as the columns of \code{GTPG_cond}) and 4 columns: chromosome (chr),
 position (pos), reference allele (ref), alternative allele (alt), score statistic (U), and variance (V).
 }

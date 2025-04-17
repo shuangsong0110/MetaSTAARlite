@@ -13,7 +13,7 @@
 #' @param obj_nullmodel an object from fitting the null model, which is either the output from \code{\link{fit_nullmodel}} function
 #' in the \code{STAARpipeline} package, or the output from \code{fitNullModel} function in the \code{GENESIS} package
 #' and transformed using the \code{\link{genesis2staar_nullmodel}} function in the \code{STAARpipeline} package.
-#' @param variant_info a data frame or matrix of variant information (unique identifier)
+#' @param variant_info a data frame of variant information (unique identifier)
 #' with p rows (listed in the same order as the columns of \code{genotype}) and should contain
 #' the following 4 columns: chromosome (chr), position (pos), reference allele (ref), and alternative allele (alt).
 #' @param qc_label a vector of quality control status for each variant in \code{variant_info}, where a PASS variant
@@ -61,6 +61,7 @@ MetaSTAARlite_worker_sumstat <- function(genotype,ALT_AF=NULL,obj_nullmodel,vari
   if(!is.null(annotation_phred) && dim(annotation_phred)[1] != dim(variant_info)[1]){
     stop(paste0("Dimensions don't match for annotation_phred and variant_info!"))
   }
+  variant_info <- as.data.frame(variant_info)
 
   N <- dim(genotype)[1]
   if(!inherits(genotype, "sparseMatrix"))

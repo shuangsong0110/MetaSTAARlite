@@ -28,7 +28,7 @@ This vector is the \code{ALT_AF} column from the \code{results_info} data frame 
 in the \code{STAARpipeline} package, or the output from \code{fitNullModel} function in the \code{GENESIS} package
 and transformed using the \code{\link{genesis2staar_nullmodel}} function in the \code{STAARpipeline} package.}
 
-\item{variant_info}{a data frame or matrix of variant information (unique identifier)
+\item{variant_info}{a data frame of variant information (unique identifier)
 with p rows (listed in the same order as the columns of \code{genotype}) and should contain
 the following 4 columns: chromosome (chr), position (pos), reference allele (ref), and alternative allele (alt).}
 

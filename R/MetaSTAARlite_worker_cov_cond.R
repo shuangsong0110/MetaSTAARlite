@@ -14,20 +14,20 @@
 #' @param obj_nullmodel an object from fitting the null model, which is either the output from \code{\link{fit_nullmodel}} function
 #' in the \code{STAARpipeline} package, or the output from \code{fitNullModel} function in the \code{GENESIS} package
 #' and transformed using the \code{\link{genesis2staar_nullmodel}} function in the \code{STAARpipeline} package.
-#' @param variant_info a data frame or matrix of variant information (unique identifier)
+#' @param variant_info a data frame of variant information (unique identifier)
 #' with p rows (listed in the same order as the columns of \code{genotype}) and should contain
 #' the following 4 columns: chromosome (chr), position (pos), reference allele (ref), and alternative allele (alt).
-#' @param variant_adj_info a data frame or matrix of adjusted variant information (unique identifier)
+#' @param variant_adj_info a data frame of adjusted variant information (unique identifier)
 #' with p_adj rows (listed in the same order as the rows of \code{genotype_adj}) and should contain
 #' the following 4 columns: chromosome (chr), position (pos), reference allele (ref), and alternative allele (alt).
 #' @return a list with the following members:
 #' @return \code{GTPG_cond}: the covariance matrix between all variants in the variant-set (rows)
 #' and all variants in the conditional variant-set (columns) (the covariance file
 #' for conditional analysis).
-#' @return \code{variant_info}: the data frame or matrix of variant information (unique identifier)
+#' @return \code{variant_info}: the data frame of variant information (unique identifier)
 #' with p rows (listed in the same order as the rows of \code{GTPG_cond}) and 4 columns: chromosome (chr),
 #' position (pos), reference allele (ref), and alternative allele (alt).
-#' @return \code{variant_adj_info}: the data frame or matrix of adjusted variant information (unique identifier)
+#' @return \code{variant_adj_info}: the data frame of adjusted variant information (unique identifier)
 #' with p_adj rows (listed in the same order as the columns of \code{GTPG_cond}) and 4 columns: chromosome (chr),
 #' position (pos), reference allele (ref), alternative allele (alt), score statistic (U), and variance (V).
 #' @references Li, X., et al. (2023). Powerful, scalable and resource-efficient
@@ -41,6 +41,9 @@ MetaSTAARlite_worker_cov_cond <- function(genotype,genotype_adj,obj_nullmodel,va
   if(!inherits(genotype, "matrix") && !inherits(genotype, "Matrix")){
     stop("genotype is not a matrix!")
   }
+  
+  variant_info <- as.data.frame(variant_info)
+  variant_adj_info <- as.data.frame(variant_adj_info)
 
   if(dim(genotype)[2] != dim(variant_info)[1]){
     stop(paste0("Dimensions don't match for genotype and variant_info!"))
