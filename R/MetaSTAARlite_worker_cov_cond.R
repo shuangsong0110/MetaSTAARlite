@@ -62,6 +62,8 @@ MetaSTAARlite_worker_cov_cond <- function(genotype,genotype_adj,obj_nullmodel,va
       genotype_adj <- na.replace.sp(genotype_adj,m=impute_vectors_adj)
     }
     genotype_adj <- as.matrix(genotype_adj)
+  } else {
+    genotype_adj <- matrix_impute(genotype_adj)
   }
 
   if(dim(genotype_adj)[2] != dim(variant_adj_info)[1]){
