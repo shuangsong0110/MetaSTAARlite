@@ -112,7 +112,7 @@ Genotype_flip_sp_extraction <- function(genofile,variant.id,sample.id,
       seqSetFilter(genofile,variant.id=variant.id.dosage[is.in.dosage],sample.id=sample.id)
       
       ## genotype id
-      id.genotype <- seqGetData(genofile,"sample.id")
+      id.genotype <- as.character(seqGetData(genofile,"sample.id"))
       
       id.genotype.merge <- data.frame(id.genotype,index=seq(1,length(id.genotype)))
       phenotype.id.merge <- data.frame(sample.id)
@@ -183,7 +183,7 @@ Genotype_flip_sp_extraction <- function(genofile,variant.id,sample.id,
       seqSetFilter(genofile,variant.id=variant.id.dosage_alt[is.in.dosage_alt],sample.id=sample.id)
       
       ## genotype id
-      id.genotype <- seqGetData(genofile,"sample.id")
+      id.genotype <- as.character(seqGetData(genofile,"sample.id"))
       
       id.genotype.merge <- data.frame(id.genotype,index=seq(1,length(id.genotype)))
       phenotype.id.merge <- data.frame(sample.id)
@@ -251,7 +251,7 @@ Genotype_flip_sp_extraction <- function(genofile,variant.id,sample.id,
     seqSetFilter(genofile,variant.id=variant.id.dosage_sp,sample.id=sample.id)
     
     ## genotype id
-    id.genotype <- seqGetData(genofile,"sample.id")
+    id.genotype <- as.character(seqGetData(genofile,"sample.id"))
     
     id.genotype.merge <- data.frame(id.genotype,index=seq(1,length(id.genotype)))
     phenotype.id.merge <- data.frame(sample.id)

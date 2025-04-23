@@ -121,32 +121,29 @@ noncoding_MetaSTAARlite_worker <- function(chr,gene_name,genofile,obj_nullmodel,
     {
       seqSetFilter(genofile,variant.id=variant.id[loc_SNV],sample.id=phenotype.id)
       
-      ## variant id
-      variant.id_adj <- seqGetData(genofile, "variant.id")
-      ## get AF, Missing rate
-      AF_AC_Missing <- seqGetAF_AC_Missing(genofile,minor=FALSE,parallel=FALSE)
-      REF_AF <- AF_AC_Missing$af
-      Missing_rate <- AF_AC_Missing$miss
-      seqResetFilter(genofile)
+      G_SNV <- seqGetData(genofile, "$dosage")
       
-      Genotype_sp <- Genotype_flip_sp_extraction(genofile,variant.id=variant.id_adj,
-                                                 sample.id=phenotype.id,
-                                                 REF_AF=REF_AF,
-                                                 Missing_rate=Missing_rate,
-                                                 QC_label=QC_label)
-      G_SNV <- Genotype_sp$Geno
-      
-      if(!is.null(G_SNV) & inherits(G_SNV, "dgCMatrix"))
-      {
-        # geno_missing_imputation: "minor"
-        G_SNV <- na.replace.sp(G_SNV,is_NA_to_Zero=TRUE)
-        results_information_adj <- Genotype_sp$results_information
-        variant_adj_info <- results_information_adj[,c("CHR","position","REF","ALT")]
+      if (!is.null(G_SNV)){
+        
+        ## genotype id
+        id.genotype <- as.character(seqGetData(genofile,"sample.id"))
+        
+        id.genotype.merge <- data.frame(id.genotype,index=seq(1,length(id.genotype)))
+        phenotype.id.merge <- data.frame(phenotype.id)
+        phenotype.id.merge <- dplyr::left_join(phenotype.id.merge,id.genotype.merge,by=c("phenotype.id"="id.genotype"))
+        id.SNV.match <- phenotype.id.merge$index
+        
+        G_SNV <- G_SNV[id.SNV.match,,drop=FALSE]
+        G_SNV <- matrix_impute(G_SNV)
+        
+        pos_adj <- as.integer(seqGetData(genofile, "position"))
+        ref_adj <- as.character(seqGetData(genofile, "$ref"))
+        alt_adj <- as.character(seqGetData(genofile, "$alt"))
+        variant_adj_info <- data.frame(chr,pos_adj,ref_adj,alt_adj)
         colnames(variant_adj_info) <- c("chr","pos","ref","alt")
         variant_adj_info
       }
-      rm(Genotype_sp,AF_AC_Missing,REF_AF,Missing_rate,results_information_adj,variant.id_adj)
-      gc()
+      seqResetFilter(genofile)
     }
   }
 

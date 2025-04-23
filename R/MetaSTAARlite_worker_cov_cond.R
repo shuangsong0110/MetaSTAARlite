@@ -57,7 +57,9 @@ MetaSTAARlite_worker_cov_cond <- function(genotype,genotype_adj,obj_nullmodel,va
     # geno_missing_imputation: "minor"
     if(any(is.na(genotype_adj@x)))
     {
-      genotype_adj <- na.replace.sp(genotype_adj,is_NA_to_Zero=TRUE)
+      AF_adj <- Matrix::colMeans(genotype_adj,na.rm = TRUE)/2
+      impute_vectors_adj <- ifelse(AF_adj<=0.5,0,2)
+      genotype_adj <- na.replace.sp(genotype_adj,m=impute_vectors_adj)
     }
     genotype_adj <- as.matrix(genotype_adj)
   }
