@@ -16,7 +16,7 @@
 #' covariance files between variants are stored.
 #' @param effect.cond a character value indicating the effects of variants to be adjusted for
 #' in conditional analysis are "homogeneous" or "heterogeneous" (default = "homogeneous").
-#' @param check_qc_label a logical value indicating whether variants need to be dropped according to \code{qc_label} (default = FALSE).
+#' @param check_qc_label a logical value indicating whether variants need to be dropped according to \code{qc_label} (default = TRUE).
 #' @param variant_type a character value specifying the type of variant included in the analysis. Choices include
 #'  "SNV", "Indel", or "variant" (default = "SNV").
 #' @param Use_annotation_weights a logical value which determines if annotations will be used as weights or not (default = TRUE).
@@ -43,7 +43,7 @@
 
 MetaSTAARlite_merge_cond <- function(chr,sample.sizes,sumstat.list,cov.list,covcond.list,
                                      rare_maf_cutoff=0.01,cov_maf_cutoff,effect.cond = c("homogeneous","heterogeneous"),
-                                     check_qc_label=FALSE,variant_type=c("SNV","Indel","variant"),
+                                     check_qc_label=TRUE,variant_type=c("SNV","Indel","variant"),
                                      Use_annotation_weights=TRUE,Annotation_name=NULL){
 
   ## evaluate choices

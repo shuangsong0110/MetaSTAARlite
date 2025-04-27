@@ -20,7 +20,7 @@
 #' @param rv_num_cutoff the cutoff of minimum number of variants of meta-analyzing
 #' a given variant-set (default = 2).
 #' @param check_qc_label a logical value indicating whether variants need to be dropped according to \code{qc_label}
-#' specified in \code{\link{ncRNA_MetaSTAARlite_worker}} (default = FALSE).
+#' specified in \code{\link{ncRNA_MetaSTAARlite_worker}} (default = TRUE).
 #' @param variant_type a character value specifying the type of variant included in the analysis. Choices include
 #'  "SNV", "Indel", or "variant" (default = "SNV").
 #' @param Use_annotation_weights a logical value which determines if annotations will be used as weights or not (default = TRUE).
@@ -45,7 +45,7 @@
 ncRNA_MetaSTAARlite <- function(chr,gene_name,
                                 sample.sizes,ncRNA_sumstat_gene_list,ncRNA_cov_gene_list,
                                 cov_maf_cutoff,rare_maf_cutoff=0.01,rv_num_cutoff=2,
-                                check_qc_label=FALSE,variant_type=c("SNV","Indel","variant"),
+                                check_qc_label=TRUE,variant_type=c("SNV","Indel","variant"),
                                 Use_annotation_weights=TRUE,Annotation_name=NULL,silent=FALSE){
 
   ## evaluate choices

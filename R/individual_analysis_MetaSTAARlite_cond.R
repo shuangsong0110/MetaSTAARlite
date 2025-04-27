@@ -13,14 +13,14 @@
 #' @param effect.cond a character value indicating the effects of variants to be adjusted for
 #' in conditional analysis are "homogeneous" or "heterogeneous" (default = "homogeneous").
 #' @param check_qc_label a logical value indicating whether variants need to be dropped according to \code{qc_label}
-#' specified in \code{\link{coding_MetaSTAARlite_worker}} (default = FALSE).
+#' specified in \code{\link{individual_analysis_MetaSTAARlite_worker}} (default = TRUE).
 #' @return a data frame containing the conditional meta-analysis score test p-value and the estimated effect size
 #' of the alternative allele for each (significant) individual variant in \code{individual_results}.
 #' @export
 
 individual_analysis_MetaSTAARlite_cond <- function(individual_results,sample.sizes,sumstat.list,covcond.list,
                                                    mac_cutoff=20,effect.cond=c("homogeneous","heterogeneous"),
-                                                   check_qc_label=FALSE){
+                                                   check_qc_label=TRUE){
 
   ## evaluate choices
   effect.cond <- match.arg(effect.cond)

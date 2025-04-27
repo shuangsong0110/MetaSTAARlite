@@ -25,7 +25,7 @@
 #' @param effect.cond a character value indicating the effects of variants to be adjusted for
 #' in conditional analysis are "homogeneous" or "heterogeneous" (default = "homogeneous").
 #' @param check_qc_label a logical value indicating whether variants need to be dropped according to \code{qc_label}
-#' specified in \code{\link{custom_MetaSTAARlite_worker}} (default = FALSE).
+#' specified in \code{\link{custom_MetaSTAARlite_worker}} (default = TRUE).
 #' @param variant_type a character value specifying the type of variant included in the analysis. Choices include
 #'  "SNV", "Indel", or "variant" (default = "SNV").
 #' @param Use_annotation_weights a logical value which determines if annotations will be used as weights or not (default = TRUE).
@@ -49,7 +49,7 @@
 custom_MetaSTAARlite_cond <- function(chr,mask_name,
                                       sample.sizes,custom_sumstat_mask_list,custom_cov_mask_list,custom_cov_cond_mask_list,
                                       cov_maf_cutoff,rare_maf_cutoff=0.01,rv_num_cutoff=2,effect.cond = c("homogeneous","heterogeneous"),
-                                      check_qc_label=FALSE,variant_type=c("SNV","Indel","variant"),
+                                      check_qc_label=TRUE,variant_type=c("SNV","Indel","variant"),
                                       Use_annotation_weights=TRUE,Annotation_name=NULL,silent=FALSE){
 
   ## evaluate choices

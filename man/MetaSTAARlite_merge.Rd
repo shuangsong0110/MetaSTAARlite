@@ -11,7 +11,7 @@ MetaSTAARlite_merge(
   cov.list,
   rare_maf_cutoff = 0.01,
   cov_maf_cutoff,
-  check_qc_label = FALSE,
+  check_qc_label = TRUE,
   variant_type = c("SNV", "Indel", "variant"),
   Use_annotation_weights = TRUE,
   Annotation_name = NULL
@@ -34,7 +34,7 @@ defining rare variants (default = 0.01).}
 indicating the maximum minor allele frequency cutoffs under which the sparse weighted
 covariance files between variants are stored.}
 
-\item{check_qc_label}{a logical value indicating whether variants need to be dropped according to \code{qc_label} (default = FALSE).}
+\item{check_qc_label}{a logical value indicating whether variants need to be dropped according to \code{qc_label} (default = TRUE).}
 
 \item{variant_type}{a character value specifying the type of variant included in the analysis. Choices include
 "SNV", "Indel", or "variant" (default = "SNV").}

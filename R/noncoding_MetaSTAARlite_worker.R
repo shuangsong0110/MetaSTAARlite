@@ -21,7 +21,7 @@
 #' @param check_qc_label a logical value indicating whether variants need to be dropped according to \code{qc_label}.
 #' If \code{check_qc_label} is FALSE, then the summary statistics will be stored for PASS variants from the study.
 #' If \code{check_qc_label} is TRUE, then the summary statistics will be stored for all variants from the study,
-#' together will an additional column of \code{qc_label} (default = FALSE).
+#' together will an additional column of \code{qc_label} (default = TRUE).
 #' @param variant_type a character value specifying the type of variant included in the analysis. Choices include
 #'  "SNV", "Indel", or "variant" (default = "SNV").
 #' @param Annotation_dir a character specifying the channel name of the annotations in the aGDS file
@@ -56,7 +56,7 @@
 #' @export
 noncoding_MetaSTAARlite_worker <- function(chr,gene_name,genofile,obj_nullmodel,known_loci=NULL,
                                            cov_maf_cutoff=0.05,signif.digits=NULL,
-                                           QC_label="annotation/filter",check_qc_label=FALSE,variant_type=c("SNV","Indel","variant"),
+                                           QC_label="annotation/filter",check_qc_label=TRUE,variant_type=c("SNV","Indel","variant"),
                                            Annotation_dir="annotation/info/FunctionalAnnotation",Annotation_name_catalog,
                                            Use_annotation_weights=TRUE,Annotation_name=NULL,
                                            silent=FALSE){

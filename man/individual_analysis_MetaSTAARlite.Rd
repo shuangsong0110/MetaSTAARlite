@@ -8,7 +8,7 @@ individual_analysis_MetaSTAARlite(
   sample.sizes,
   sumstat.list,
   mac_cutoff = 20,
-  check_qc_label = FALSE
+  check_qc_label = TRUE
 )
 }
 \arguments{
@@ -21,7 +21,7 @@ indicating the sample size of each study.}
 defining individual variants (default = 20).}
 
 \item{check_qc_label}{a logical value indicating whether variants need to be dropped according to \code{qc_label}
-specified in \code{\link{individual_analysis_MetaSTAARlite_worker}} (default = FALSE).}
+specified in \code{\link{individual_analysis_MetaSTAARlite_worker}} (default = TRUE).}
 }
 \value{
 a data frame containing the meta-analysis score test p-value and the estimated effect size of the alternative allele

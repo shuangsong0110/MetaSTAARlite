@@ -8,14 +8,14 @@
 #' @param mac_cutoff an integer specifying the cutoff of minimum combined minor allele count in
 #' defining individual variants (default = 20).
 #' @param check_qc_label a logical value indicating whether variants need to be dropped according to \code{qc_label}
-#' specified in \code{\link{individual_analysis_MetaSTAARlite_worker}} (default = FALSE).
+#' specified in \code{\link{individual_analysis_MetaSTAARlite_worker}} (default = TRUE).
 #' @return a data frame containing the meta-analysis score test p-value and the estimated effect size of the alternative allele
 #' for each individual variant in the given genetic region.
 #' @export
 
 
 individual_analysis_MetaSTAARlite <- function(sample.sizes,sumstat.list,
-                                              mac_cutoff=20,check_qc_label=FALSE){
+                                              mac_cutoff=20,check_qc_label=TRUE){
 
   cov_maf_cutoff <- rep(0.5 + 1e-16,length(sample.sizes))
   ### summary statistics

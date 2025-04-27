@@ -13,7 +13,7 @@ noncoding_MetaSTAARlite_worker(
   cov_maf_cutoff = 0.05,
   signif.digits = NULL,
   QC_label = "annotation/filter",
-  check_qc_label = FALSE,
+  check_qc_label = TRUE,
   variant_type = c("SNV", "Indel", "variant"),
   Annotation_dir = "annotation/info/FunctionalAnnotation",
   Annotation_name_catalog,
@@ -50,7 +50,7 @@ it is assumed that no rounding will be performed (default = NULL).}
 \item{check_qc_label}{a logical value indicating whether variants need to be dropped according to \code{qc_label}.
 If \code{check_qc_label} is FALSE, then the summary statistics will be stored for PASS variants from the study.
 If \code{check_qc_label} is TRUE, then the summary statistics will be stored for all variants from the study,
-together will an additional column of \code{qc_label} (default = FALSE).}
+together will an additional column of \code{qc_label} (default = TRUE).}
 
 \item{variant_type}{a character value specifying the type of variant included in the analysis. Choices include
 "SNV", "Indel", or "variant" (default = "SNV").}

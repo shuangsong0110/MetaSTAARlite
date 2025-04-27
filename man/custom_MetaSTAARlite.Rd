@@ -13,7 +13,7 @@ custom_MetaSTAARlite(
   cov_maf_cutoff,
   rare_maf_cutoff = 0.01,
   rv_num_cutoff = 2,
-  check_qc_label = FALSE,
+  check_qc_label = TRUE,
   variant_type = c("SNV", "Indel", "variant"),
   Use_annotation_weights = TRUE,
   Annotation_name = NULL,
@@ -43,7 +43,7 @@ defining rare variants (default = 0.01).}
 a given variant-set (default = 2).}
 
 \item{check_qc_label}{a logical value indicating whether variants need to be dropped according to \code{qc_label}
-specified in \code{\link{custom_MetaSTAARlite_worker}} (default = FALSE).}
+specified in \code{\link{custom_MetaSTAARlite_worker}} (default = TRUE).}
 
 \item{variant_type}{a character value specifying the type of variant included in the analysis. Choices include
 "SNV", "Indel", or "variant" (default = "SNV").}
