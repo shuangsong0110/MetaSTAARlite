@@ -281,13 +281,16 @@ noncoding_MetaSTAARlite_worker <- function(chr,gene_name,genofile,obj_nullmodel,
     {
       try(cov_cond <- MetaSTAARlite_worker_cov_cond(Geno,G_SNV,obj_nullmodel,variant_info,variant_adj_info),silent=silent)
     }
+    
+    cov_cond_list[["downstream"]] <- cov_cond
+  } else {
+    cov_cond_list[["downstream"]] <- list(NULL)
   }
 
   seqResetFilter(genofile)
 
   summary_stat_list[["downstream"]] <- summary_stat
   GTSinvG_rare_list[["downstream"]] <- GTSinvG_rare
-  cov_cond_list[["downstream"]] <- cov_cond
 
   ########################################
   #   Upstream
@@ -415,13 +418,16 @@ noncoding_MetaSTAARlite_worker <- function(chr,gene_name,genofile,obj_nullmodel,
     {
       try(cov_cond <- MetaSTAARlite_worker_cov_cond(Geno,G_SNV,obj_nullmodel,variant_info,variant_adj_info),silent=silent)
     }
+    
+    cov_cond_list[["upstream"]] <- cov_cond
+  } else {
+    cov_cond_list[["upstream"]] <- list(NULL)
   }
 
   seqResetFilter(genofile)
 
   summary_stat_list[["upstream"]] <- summary_stat
   GTSinvG_rare_list[["upstream"]] <- GTSinvG_rare
-  cov_cond_list[["upstream"]] <- cov_cond
 
   ########################################################
   #                UTR
@@ -547,13 +553,16 @@ noncoding_MetaSTAARlite_worker <- function(chr,gene_name,genofile,obj_nullmodel,
     {
       try(cov_cond <- MetaSTAARlite_worker_cov_cond(Geno,G_SNV,obj_nullmodel,variant_info,variant_adj_info),silent=silent)
     }
+    
+    cov_cond_list[["UTR"]] <- cov_cond
+  } else {
+    cov_cond_list[["UTR"]] <- list(NULL)
   }
 
   seqResetFilter(genofile)
 
   summary_stat_list[["UTR"]] <- summary_stat
   GTSinvG_rare_list[["UTR"]] <- GTSinvG_rare
-  cov_cond_list[["UTR"]] <- cov_cond
 
   #############################################
   #   Promoter-CAGE
@@ -721,13 +730,16 @@ noncoding_MetaSTAARlite_worker <- function(chr,gene_name,genofile,obj_nullmodel,
     {
       try(cov_cond <- MetaSTAARlite_worker_cov_cond(Geno,G_SNV,obj_nullmodel,variant_info,variant_adj_info),silent=silent)
     }
+    
+    cov_cond_list[["promoter_CAGE"]] <- cov_cond
+  } else {
+    cov_cond_list[["promoter_CAGE"]] <- list(NULL)
   }
 
   seqResetFilter(genofile)
 
   summary_stat_list[["promoter_CAGE"]] <- summary_stat
   GTSinvG_rare_list[["promoter_CAGE"]] <- GTSinvG_rare
-  cov_cond_list[["promoter_CAGE"]] <- cov_cond
 
   ##################################################
   #       Promoter-DHS
@@ -891,13 +903,16 @@ noncoding_MetaSTAARlite_worker <- function(chr,gene_name,genofile,obj_nullmodel,
     {
       try(cov_cond <- MetaSTAARlite_worker_cov_cond(Geno,G_SNV,obj_nullmodel,variant_info,variant_adj_info),silent=silent)
     }
+    
+    cov_cond_list[["promoter_DHS"]] <- cov_cond
+  } else {
+    cov_cond_list[["promoter_DHS"]] <- list(NULL)
   }
 
   seqResetFilter(genofile)
 
   summary_stat_list[["promoter_DHS"]] <- summary_stat
   GTSinvG_rare_list[["promoter_DHS"]] <- GTSinvG_rare
-  cov_cond_list[["promoter_DHS"]] <- cov_cond
 
   ###########################################
   #        Enhancer-CAGE
@@ -1065,13 +1080,16 @@ noncoding_MetaSTAARlite_worker <- function(chr,gene_name,genofile,obj_nullmodel,
     {
       try(cov_cond <- MetaSTAARlite_worker_cov_cond(Geno,G_SNV,obj_nullmodel,variant_info,variant_adj_info),silent=silent)
     }
+    
+    cov_cond_list[["enhancer_CAGE"]] <- cov_cond
+  } else {
+    cov_cond_list[["enhancer_CAGE"]] <- list(NULL)
   }
 
   seqResetFilter(genofile)
 
   summary_stat_list[["enhancer_CAGE"]] <- summary_stat
   GTSinvG_rare_list[["enhancer_CAGE"]] <- GTSinvG_rare
-  cov_cond_list[["enhancer_CAGE"]] <- cov_cond
 
   ##################################################
   #       Enhancer-DHS
@@ -1238,13 +1256,45 @@ noncoding_MetaSTAARlite_worker <- function(chr,gene_name,genofile,obj_nullmodel,
     {
       try(cov_cond <- MetaSTAARlite_worker_cov_cond(Geno,G_SNV,obj_nullmodel,variant_info,variant_adj_info),silent=silent)
     }
+    
+    cov_cond_list[["enhancer_DHS"]] <- cov_cond
+  } else {
+    cov_cond_list[["enhancer_DHS"]] <- list(NULL)
   }
 
   seqResetFilter(genofile)
 
   summary_stat_list[["enhancer_DHS"]] <- summary_stat
   GTSinvG_rare_list[["enhancer_DHS"]] <- GTSinvG_rare
-  cov_cond_list[["enhancer_DHS"]] <- cov_cond
+  
+  if(!is.null(known_loci) & !is.null(G_SNV))
+  {
+    # Identify which masks have NULL or list(NULL) covariance matrices
+    is_effectively_null <- sapply(cov_cond_list, function(x) {is.null(x) || identical(x, list(NULL))})
+    if(sum(is_effectively_null)>0)
+    {
+      cov_cond_template <- NULL
+      
+      ## Compute template covariance matrices for conditional analysis using the first variant in known loci
+      try(cov_cond_template <- MetaSTAARlite_worker_cov_cond(G_SNV[, 1, drop = FALSE],G_SNV,
+                                                             obj_nullmodel,
+                                                             variant_adj_info[1, , drop = FALSE],variant_adj_info),silent=silent)
+      
+      if(!is.null(cov_cond_template))
+      {
+        # Fill in only the masks that are effectively null
+        null_masks <- names(cov_cond_list)[which(is_effectively_null)]
+        
+        for (mask in null_masks) 
+        {
+          cov_cond_list[[mask]] <- list(GTPG_cond = NULL,
+                                        G_condTPG_cond = cov_cond_template$G_condTPG_cond,
+                                        variant_info = NULL,
+                                        variant_adj_info = cov_cond_template$variant_adj_info)
+        }
+      }
+    }
+  }
 
   if(!is.null(known_loci))
   {

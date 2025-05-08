@@ -285,11 +285,14 @@ coding_MetaSTAARlite_worker <- function(chr,gene_name,genofile,obj_nullmodel,gen
     {
       try(cov_cond <- MetaSTAARlite_worker_cov_cond(Geno,G_SNV,obj_nullmodel,variant_info,variant_adj_info),silent=silent)
     }
+    
+    cov_cond_list[["plof_ds"]] <- cov_cond
+  } else {
+    cov_cond_list[["plof_ds"]] <- list(NULL)
   }
 
   summary_stat_list[["plof_ds"]] <- summary_stat
   GTSinvG_rare_list[["plof_ds"]] <- GTSinvG_rare
-  cov_cond_list[["plof_ds"]] <- cov_cond
 
   #####################################################
   #                      plof
@@ -345,11 +348,14 @@ coding_MetaSTAARlite_worker <- function(chr,gene_name,genofile,obj_nullmodel,gen
     {
       try(cov_cond <- MetaSTAARlite_worker_cov_cond(Geno,G_SNV,obj_nullmodel,variant_info,variant_adj_info),silent=silent)
     }
+    
+    cov_cond_list[["plof"]] <- cov_cond
+  } else {
+    cov_cond_list[["plof"]] <- list(NULL)
   }
 
   summary_stat_list[["plof"]] <- summary_stat
   GTSinvG_rare_list[["plof"]] <- GTSinvG_rare
-  cov_cond_list[["plof"]] <- cov_cond
 
   #############################################
   #             synonymous
@@ -405,11 +411,14 @@ coding_MetaSTAARlite_worker <- function(chr,gene_name,genofile,obj_nullmodel,gen
     {
       try(cov_cond <- MetaSTAARlite_worker_cov_cond(Geno,G_SNV,obj_nullmodel,variant_info,variant_adj_info),silent=silent)
     }
+    
+    cov_cond_list[["synonymous"]] <- cov_cond
+  } else {
+    cov_cond_list[["synonymous"]] <- list(NULL)
   }
 
   summary_stat_list[["synonymous"]] <- summary_stat
   GTSinvG_rare_list[["synonymous"]] <- GTSinvG_rare
-  cov_cond_list[["synonymous"]] <- cov_cond
 
   #################################################
   #        missense
@@ -465,11 +474,14 @@ coding_MetaSTAARlite_worker <- function(chr,gene_name,genofile,obj_nullmodel,gen
     {
       try(cov_cond <- MetaSTAARlite_worker_cov_cond(Geno,G_SNV,obj_nullmodel,variant_info,variant_adj_info),silent=silent)
     }
+    
+    cov_cond_list[["missense"]] <- cov_cond
+  } else {
+    cov_cond_list[["missense"]] <- list(NULL)
   }
 
   summary_stat_list[["missense"]] <- summary_stat
   GTSinvG_rare_list[["missense"]] <- GTSinvG_rare
-  cov_cond_list[["missense"]] <- cov_cond
 
   #################################################
   #         disruptive missense
@@ -525,11 +537,43 @@ coding_MetaSTAARlite_worker <- function(chr,gene_name,genofile,obj_nullmodel,gen
     {
       try(cov_cond <- MetaSTAARlite_worker_cov_cond(Geno,G_SNV,obj_nullmodel,variant_info,variant_adj_info),silent=silent)
     }
+    
+    cov_cond_list[["disruptive_missense"]] <- cov_cond
+  } else {
+    cov_cond_list[["disruptive_missense"]] <- list(NULL)
   }
 
   summary_stat_list[["disruptive_missense"]] <- summary_stat
   GTSinvG_rare_list[["disruptive_missense"]] <- GTSinvG_rare
-  cov_cond_list[["disruptive_missense"]] <- cov_cond
+  
+  if(!is.null(known_loci) & !is.null(G_SNV))
+  {
+    # Identify which masks have NULL or list(NULL) covariance matrices
+    is_effectively_null <- sapply(cov_cond_list, function(x) {is.null(x) || identical(x, list(NULL))})
+    if(sum(is_effectively_null)>0)
+    {
+      cov_cond_template <- NULL
+      
+      ## Compute template covariance matrices for conditional analysis using the first variant in known loci
+      try(cov_cond_template <- MetaSTAARlite_worker_cov_cond(G_SNV[, 1, drop = FALSE],G_SNV,
+                                                             obj_nullmodel,
+                                                             variant_adj_info[1, , drop = FALSE],variant_adj_info),silent=silent)
+      
+      if(!is.null(cov_cond_template))
+      {
+        # Fill in only the masks that are effectively null
+        null_masks <- names(cov_cond_list)[which(is_effectively_null)]
+        
+        for (mask in null_masks) 
+        {
+          cov_cond_list[[mask]] <- list(GTPG_cond = NULL,
+                                        G_condTPG_cond = cov_cond_template$G_condTPG_cond,
+                                        variant_info = NULL,
+                                        variant_adj_info = cov_cond_template$variant_adj_info)
+        }
+      }
+    }
+  }
 
   seqResetFilter(genofile)
 

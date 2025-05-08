@@ -190,6 +190,10 @@ MetaSTAARlite_merge_cond <- function(chr,sample.sizes,sumstat.list,cov.list,covc
   U_adj.list <- lapply(covcond.list, function(x) {x$variant_adj_info$U})
   GTPG_cond.list <- lapply(covcond.list, function(x) {x$GTPG_cond})
   G_condTPG_cond.list <- lapply(covcond.list, function(x) {x$G_condTPG_cond})
+  G_condTPG_cond.list <- Filter(Negate(is.null), G_condTPG_cond.list)
+  if (length(G_condTPG_cond.list) == 0) {
+    return(NULL)
+  }
   info$index <- 1:dim(info)[1]
   ex.index <- left_join(variant_adj_info,info,by=c("chr"="chr",
                                                    "pos"="pos",

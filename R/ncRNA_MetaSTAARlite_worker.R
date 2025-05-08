@@ -277,6 +277,28 @@ ncRNA_MetaSTAARlite_worker <- function(chr,gene_name,genofile,obj_nullmodel,know
       try(cov_cond <- MetaSTAARlite_worker_cov_cond(Geno,G_SNV,obj_nullmodel,variant_info,variant_adj_info),silent=silent)
     }
   }
+  
+  if(!is.null(known_loci) & !is.null(G_SNV))
+  {
+    is_effectively_null <- is.null(cov_cond)
+    if(is_effectively_null)
+    {
+      cov_cond_template <- NULL
+      
+      ## Compute template covariance matrices for conditional analysis using the first variant in known loci
+      try(cov_cond_template <- MetaSTAARlite_worker_cov_cond(G_SNV[, 1, drop = FALSE],G_SNV,
+                                                             obj_nullmodel,
+                                                             variant_adj_info[1, , drop = FALSE],variant_adj_info),silent=silent)
+      
+      if(!is.null(cov_cond_template))
+      {
+        cov_cond <- list(GTPG_cond = NULL,
+                         G_condTPG_cond = cov_cond_template$G_condTPG_cond,
+                         variant_info = NULL,
+                         variant_adj_info = cov_cond_template$variant_adj_info)
+      }
+    }
+  }
 
   seqResetFilter(genofile)
 
