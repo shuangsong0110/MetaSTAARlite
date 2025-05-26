@@ -15,7 +15,7 @@
 
 
 individual_analysis_MetaSTAARlite <- function(sample.sizes,sumstat.list,
-                                              mac_cutoff=20,maf_cutoff=0.01,check_qc_label=TRUE){
+                                              mac_cutoff=20,check_qc_label=TRUE){
 
   cov_maf_cutoff <- rep(0.5 + 1e-16,length(sample.sizes))
   ### summary statistics
@@ -75,7 +75,7 @@ individual_analysis_MetaSTAARlite <- function(sample.sizes,sumstat.list,
   N.merge <- Reduce("+",lapply(sumstat.merge.list, function(x) {x$N}))
   MAC.merge <- pmin(alt_AC.merge, 2 * N.merge - alt_AC.merge)
   MAF.merge <- MAC.merge / (2 * N.merge)
-  cv.index <- (MAF.merge>max((mac_cutoff - 0.5) / (2 * N.merge),maf_cutoff)) & Reduce("*",mapply(function(x,y) {
+  cv.index <- (MAF.merge>(mac_cutoff - 0.5) / (2 * N.merge)) & Reduce("*",mapply(function(x,y) {
     x$MAF<y
   }, x = sumstat.merge.list, y = cov_maf_cutoff, SIMPLIFY = FALSE))
   if (check_qc_label){
